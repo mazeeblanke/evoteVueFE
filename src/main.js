@@ -20,7 +20,7 @@ window.clBaseURL = 'https://res.cloudinary.com/dpisximfc/image/upload/w_120,h_12
 window.baseUrl = process.env.NODE_ENV === 'development'
   ? `http://evote.test/api`
   // : 'https://enigmatic-forest-11569.herokuapp.com'
-  : 'https://arcane-refuge-82130.herokuapp.com/public/'
+  : 'https://arcane-refuge-82130.herokuapp.com/public/api'
 
 axios.interceptors.request.use((config) => {
     const baseUrl = window.baseUrl
