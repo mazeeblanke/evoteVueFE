@@ -1,6 +1,14 @@
 import Vue from 'vue'
 import {
   Vuetify,
+  VDatePicker,
+  VMenu,
+  VDialog,
+  VProgressCircular,
+  VAlert,
+  VAvatar,
+  VCheckbox,
+  VDataTable,
   VApp,
   VJumbotron,
   VCard,
@@ -11,7 +19,12 @@ import {
   VBtn,
   VIcon,
   VGrid,
+  VSelect,
   VToolbar,
+  VTextField,
+  VSnackbar,
+  VSwitch,
+  VDivider,
   transitions
 } from 'vuetify'
 import 'vuetify/src/stylus/app.styl'
@@ -19,6 +32,19 @@ import 'vuetify/src/stylus/app.styl'
 Vue.use(Vuetify, {
   components: {
     VApp,
+    VSwitch,
+    VDatePicker,
+    VDivider,
+    VMenu,
+    VSnackbar,
+    VCheckbox,
+    VDialog,
+    VAlert,
+    VSelect,
+    VProgressCircular,
+    VDataTable,
+    VAvatar,
+    VTextField,
     VCard,
     VJumbotron,
     VSubheader,

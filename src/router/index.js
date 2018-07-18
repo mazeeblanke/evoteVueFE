@@ -34,6 +34,11 @@ export default new Router({
                 path: 'profile', 
                 component: () => import('@/components/Profile'),
                 name: 'Profile' 
+            },
+            { 
+                path: 'users', 
+                component: () => import('@/components/Users'),
+                name: 'Users' 
             }
         ],
     } 

@@ -3,14 +3,58 @@
 </template>
 
 <script>
+  import { mapActions, mapState } from 'vuex'
+
   export default {
-    components: {
-      // Navbar,
-      // Sidebar
-    },
     data: () => ({
-    
+
     }),
+
+    computed: {
+      ...mapState('auth', [
+        'isLoggedIn'
+      ])
+    },
+
+    watch: {
+      $route (newVal) {
+        if (
+          (
+            newVal.name === 'register' ||
+            newVal.name === 'register'
+          ) && this.isLoggedIn
+        ) {
+          //todo make snackbar telling the user he is loggedin
+          this.$router.push({
+            name: 'Profile'
+          })
+        }
+
+        if (
+          (
+            newVal.name !== 'register' ||
+            newVal.name !== 'register'
+          ) && !this.isLoggedIn
+        ) {
+          //todo make snackbar telling the user he is not loggedin
+          this.$router.push({
+            name: 'login'
+          })
+        }
+      }
+    },
+
+    methods: {
+      ...mapActions('user', ['me'])
+    },
+
+    created () {
+      this.me().catch(() => {
+        this.$router.push({
+          name: 'login'
+        })
+      })
+    },
     props: {
       source: String
     }
@@ -25,12 +69,12 @@ body {
     font: 100% / 1.414 "Open Sans", "Roboto", arial, sans-serif;
     background: #e9e9e9;
   }
-  
+
   a,
   [type="submit"] {
     transition: all .25s ease-in;
   }
-  
+
   .signup__container {
     position: absolute;
     top: 50%;
@@ -49,7 +93,7 @@ body {
     border-radius: 0.1875rem;
     box-shadow: 0px 0.1875rem 0.4375rem rgba(0, 0, 0, 0.25);
   }
-  
+
   .signup__overlay {
     position: absolute;
     top: 0;
@@ -58,70 +102,71 @@ body {
     height: 100%;
     background-color: rgba(0, 0, 0, 0.76);
   }
-  
+
   .container__child {
     width: 50%;
     height: 100%;
     color: #fff;
   }
-  
+
   .signup__thumbnail {
     position: relative;
     padding: 2rem;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    background: url(http://ultraimg.com/images/spectre-login.jpg);
+    /* background: url(http://ultraimg.com/images/spectre-login.jpg); */
     background-repeat: no-repeat;
     background-position: top center;
     background-size: cover;
   }
-  
+
   .thumbnail__logo,
   .thumbnail__content,
   .thumbnail__links {
     position: relative;
     z-index: 2;
   }
-  
+
   .thumbnail__logo {
     align-self: flex-start;
   }
-  
+
   .logo__shape {
     fill: #fff;
   }
-  
+
   .logo__text {
     display: inline-block;
     font-size: .8rem;
     font-weight: 700;
     vertical-align: bottom;
   }
-  
+
   .thumbnail__content {
     align-self: center;
+    width: 100%;
   }
-  
+
   h1,
   h2 {
     font-weight: 300;
     color: white;
   }
-  
+
   .heading--primary {
     font-size: 1.999rem;
   }
-  
+
   .heading--secondary {
     font-size: 1.414rem;
   }
-  
+
   .thumbnail__links {
     align-self: flex-end;
     width: 100%;
   }
-  
+
   .thumbnail__links a {
     font-size: 1rem;
     color: #fff;
@@ -129,18 +174,18 @@ body {
   .thumbnail__links a:focus, .thumbnail__links a:hover {
     color: rgba(255, 255, 255, 0.5);
   }
-  
+
   .signup__form {
     padding: 2.5rem;
     background: #fafafa;
   }
-  
+
   label {
     font-size: .85rem;
     text-transform: uppercase;
     color: #ccc;
   }
-  
+
   .form-control {
     background-color: transparent;
     border-top: 0;
@@ -151,15 +196,15 @@ body {
   .form-control:focus {
     border-color: #111;
   }
-  
+
   [type="text"] {
     color: #111;
   }
-  
+
   [type="password"] {
     color: #111;
   }
-  
+
   .btn--form {
     padding: .5rem 2.5rem;
     font-size: .95rem;
@@ -172,7 +217,7 @@ body {
   .btn--form:focus, .btn--form:hover {
     background: #323232;
   }
-  
+
   .signup__link {
     font-size: .8rem;
     font-weight: 600;
@@ -182,5 +227,5 @@ body {
   .signup__link:focus, .signup__link:hover {
     color: #787878;
   }
-  
+
 </style>

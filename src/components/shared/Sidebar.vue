@@ -1,12 +1,16 @@
 <template>
     <v-navigation-drawer
-      v-model="drawer"
+      :value="drawer"
       fixed
       clipped
       app
     >
       <v-list dense>
-        <v-list-tile v-for="item in items" :key="item.text">
+        <v-list-tile
+          :to="item.route"
+          v-for="item in items"
+          :key="item.text"
+        >
           <v-list-tile-action>
             <v-icon>{{ item.icon }}</v-icon>
           </v-list-tile-action>
@@ -16,15 +20,41 @@
             </v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
-        <v-subheader class="mt-3 grey--text text--darken-1">SUBSCRIPTIONS</v-subheader>
+        <v-subheader class="mt-3 grey--text text--darken-1">ADMIN PANEL</v-subheader>
         <v-list>
-          <v-list-tile v-for="item in items2" :key="item.text" avatar>
-            <v-list-tile-avatar>
-              <img :src="`https://randomuser.me/api/portraits/men/${item.picture}.jpg`" alt="">
-            </v-list-tile-avatar>
-            <v-list-tile-title v-text="item.text"></v-list-tile-title>
+          <v-list-tile @click="">
+            <v-list-tile-content>
+              <v-list-tile-title>Dashboard</v-list-tile-title>
+              <v-list-tile-sub-title>Quick review metrics</v-list-tile-sub-title>
+            </v-list-tile-content>
           </v-list-tile>
         </v-list>
+        <v-list-group
+            v-for="item in items2"
+            v-model="item.active"
+            :key="item.title"
+            no-action
+          >
+            <v-list-tile slot="activator">
+              <v-list-tile-content>
+                <v-list-tile-title>{{ item.title }}</v-list-tile-title>
+              </v-list-tile-content>
+            </v-list-tile>
+
+            <v-list-tile
+              :to="subItem.route"
+              v-for="subItem in item.items"
+              :key="subItem.title"
+            >
+              <v-list-tile-content>
+                <v-list-tile-title class="fw400">{{ subItem.title }}</v-list-tile-title>
+              </v-list-tile-content>
+
+              <v-list-tile-action>
+                <v-icon>{{ subItem.icon }}</v-icon>
+              </v-list-tile-action>
+            </v-list-tile>
+          </v-list-group>
         <v-list-tile class="mt-3">
           <v-list-tile-action>
             <v-icon color="grey darken-1">add_circle_outline</v-icon>
@@ -42,25 +72,37 @@
 </template>
 
 <script>
+import { mapState } from  'vuex'
 export default {
-    data: () => {
-        return {
-            drawer: true,
-            items: [
-                { icon: 'trending_up', text: 'Profile' },
-                { icon: 'subscriptions', text: 'Subscriptions' },
-                { icon: 'history', text: 'History' },
-                { icon: 'featured_play_list', text: 'Playlists' },
-                { icon: 'watch_later', text: 'Watch Later' }
-            ],
-            items2: [
-                { picture: 28, text: 'Joseph' },
-                { picture: 38, text: 'Apple' },
-                { picture: 48, text: 'Xbox Ahoy' },
-                { picture: 58, text: 'Nokia' },
-                { picture: 78, text: 'MKBHD' }
-            ]
+  data: () => {
+    return {
+      items: [
+        { icon: 'account_box', text: 'Profile', route: { name: 'Profile' } },
+        { icon: 'history', text: 'Live Vote Results', route: 'b' },
+      ],
+      items2: [
+        {
+          action: 'local_activity',
+          title: 'Users Management',
+          items: [
+            { title: 'View Users', route: { name: 'Users' } }
+          ]
+        },
+        {
+          action: 'restaurant',
+          title: 'Vote Management',
+          active: true,
+          items: [
+            { icon: 'add', title: 'Create Campaigns', route: { name: 'Users' } },
+            { icon: 'visibility', title: 'View Vote Campaigns', route: 'e' },
+            { icon: 'history', title: 'View Vote Results', route: 'f' }
+          ]
         }
+      ]
     }
+  },
+  computed: {
+    ...mapState('app', ['drawer'])
+  }
 }
 </script>
