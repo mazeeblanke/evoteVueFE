@@ -4,7 +4,7 @@
       <v-flex xs12>
         <v-card raised :height=800>
           <v-card-title class="card-gradient">
-            <h3 class="headline">Users</h3>
+            <h3 class="headline">Campaigns</h3>
             <v-spacer></v-spacer>
             <v-layout justify-end>
               <v-flex justify-end align-end md5 p5>
@@ -15,7 +15,7 @@
                   single-line hide-details
                 ></v-text-field>
               </v-flex>
-              <v-flex justify-end align-end md3 p5>
+              <!-- <v-flex justify-end align-end md3 p5>
                 <v-select
                   v-model="pagination.confirmed"
                   item-text="text"
@@ -24,29 +24,21 @@
                   label="Confirmation status"
                   clearable
                 ></v-select>
-              </v-flex>
+              </v-flex> -->
             </v-layout>
           </v-card-title>
           <v-data-table
             :headers="headers"
-            :items="users.data"
+            :items="campaigns.data"
             :search="search"
             :rows-per-page-items="perPageValues"
             :pagination.sync="pagination"
-            :total-items="users.total"
+            :total-items="campaigns.total"
             :loading="loading"
+            :headers-length=7
           >
             <template slot="headers" slot-scope="props">
               <tr>
-                <th>
-                  <v-checkbox
-                    :input-value="props.all"
-                    :indeterminate="props.indeterminate"
-                    primary
-                    hide-details
-                    @click.native="toggleAll"
-                  ></v-checkbox>
-                </th>
                 <th
                   v-for="header in props.headers"
                   :key="header.text"
@@ -69,7 +61,7 @@
                   ></v-checkbox>
                 </td>
                 <td>{{ props.item.id }}</td>
-                <td>{{ props.item.username }}</td>
+                <td>{{ props.item.campaignname }}</td>
                 <td>{{ props.item.email }}</td>
                 <td>{{ props.item.phone }}</td>
                 <td>{{ props.item.confirmed }}</td>
@@ -93,7 +85,7 @@
           <v-dialog v-model="dialog" max-width="800px">
             <v-card>
               <v-card-title>
-                <span class="headline">Edit User</span>
+                <span class="headline">Edit Campaign</span>
               </v-card-title>
               <v-card-text>
                 <v-container grid-list-md>
@@ -118,8 +110,8 @@
                     </v-flex>
                       <v-flex xs12 sm6 md4>
                         <v-text-field
-                          v-model="editedItem.username"
-                          label="Username"
+                          v-model="editedItem.campaignname"
+                          label="Campaignname"
                           box
                           clearable
                           disabled
@@ -135,7 +127,7 @@
                         ></v-text-field>
                       </v-flex>
                       <v-flex xs12 sm6 md4>
-                        <v-select
+                        <!-- <v-select
                           :items="confirmation_statuses"
                           v-model="editedItem.confirmed"
                           item-text="text"
@@ -143,7 +135,7 @@
                           label="Verification status"
                           box
                           clearable
-                        ></v-select>
+                        ></v-select> -->
                       </v-flex>
                   </v-layout>
                 </v-container>
@@ -191,15 +183,15 @@
   export default {
 
     computed: {
-      ...mapState('user', ['users']),
+      ...mapState('campaign', ['campaigns']),
     },
 
     methods: {
 
-      ...mapActions('user', ['loadUsers', 'verifyUser']),
+      ...mapActions('campaign', ['loadCampaigns', 'verifyCampaign']),
 
       editItem(item) {
-        this.editedIndex = this.users.data.indexOf(item)
+        this.editedIndex = this.campaigns.data.indexOf(item)
         this.editedItem = Object.assign({}, item)
         this.dialog = true
       },
@@ -211,8 +203,8 @@
       },
 
       deleteItem(item) {
-        const index = this.users.data.indexOf(item)
-        confirm('Are you sure you want to delete this item?') && this.users.data.splice(index, 1)
+        const index = this.campaigns.data.indexOf(item)
+        confirm('Are you sure you want to delete this item?') && this.campaigns.data.splice(index, 1)
       },
 
       close() {
@@ -225,13 +217,13 @@
 
       save() {
         this.verifying = true
-        this.verifyUser({
+        this.verifyCampaign({
           confirmed: this.editedItem.confirmed,
-          userId: this.editedItem.id
+          campaignId: this.editedItem.id
         })
         .then(() => {
           this.close()
-          this.snackbarText = "Succesfully updated user!"
+          this.snackbarText = "Succesfully updated campaign!"
           this.snackbar = true
           this.verifying = false
         })
@@ -260,7 +252,7 @@
             confirmed,
           }
 
-          this.loadUsers(this.filter)
+          this.loadCampaigns(this.filter)
             .then(() => {
               this.loading = false
             })
@@ -275,9 +267,9 @@
     },
 
     mounted () {
-      if (this.users.data.length) return
+      if (this.campaigns.data.length) return
       this.loading = true
-      this.loadUsers(this.filter)
+      this.loadCampaigns(this.filter)
         .then(() => {
           this.loading = false
         })
@@ -300,87 +292,45 @@
           'value': -1
         }],
         search: null,
-        confirmation_statuses: [
-          {
-            value: true,
-            text: 'Verified'
-          },
-          {
-            value: false,
-            text: 'Unverified'
-          },
-        ],
-
+        // confirmation_statuses: [
+        //   {
+        //     value: true,
+        //     text: 'Verified'
+        //   },
+        //   {
+        //     value: false,
+        //     text: 'Unverified'
+        //   },
+        // ],
         total: 0,
-
         pagination: {},
-
         filter: {
-
           limit: 10,
-
           page: 1
-
         },
 
-        headers: [{
-
-            text: 'ID',
-
-            value: 'calories'
-
-          },
-
+        headers: [
           {
-
-            text: 'Username',
-
-            value: 'fat'
-
+            text: 'ID'
           },
-
           {
-
-            text: 'Email',
-
-            value: 'carbs'
-
+            text: 'Campaignname'
           },
-
           {
-
-            text: 'Phone',
-
-            value: 'protein'
-
+            text: 'Email'
           },
-
           {
-
-            text: 'Confirmed',
-
-            value: 'iron'
-
+            text: 'Phone'
           },
-
           {
-
+            text: 'Confirmed'
+          },
+          {
             text: 'Created At',
-
-            value: 'iron'
-
-          },
-
-          {},
-
-          {},
-
+          }
         ]
-
       }
-
     }
-
   }
 </script>
 

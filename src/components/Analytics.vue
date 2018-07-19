@@ -1,5 +1,5 @@
 <template>
-  <v-container grid-list-md class="analytics" :fluid="true" :fill-height="false">
+  <v-container grid-list-md class="analytics" :class="{'dark': this.darkMode}" :fluid="true" :fill-height="false">
     <v-layout align-center justify-center>
       <v-flex xs12>
         <v-card>
@@ -9,7 +9,7 @@
           <v-card-text>
             <v-layout row wrap md12 xs12 p20>
               <v-flex xs12 md3 p5>
-                <v-card ripple raised class="card1"  height=200>
+                <v-card ripple class="card1"  height=200>
                   <v-layout d-flex row wrap fill-height class="m0">
                     <v-flex d-flex align-center justify-center xs12>
                       <div>
@@ -22,7 +22,7 @@
               </v-flex>
 
               <v-flex xs12 md3 p5 >
-                <v-card ripple raised class="card2" height=200>
+                <v-card ripple class="card2" height=200>
                   <v-layout row wrap fill-height class="m0">
                     <v-flex d-flex align-center justify-center xs12>
                       <div>
@@ -35,7 +35,7 @@
               </v-flex>
 
               <v-flex xs12 md3 p5>
-                <v-card ripple raised class="card3" height=200>
+                <v-card ripple class="card3" height=200>
                   <v-layout row wrap fill-height class="m0">
                     <v-flex d-flex align-center justify-center xs12>
                       <div>
@@ -48,7 +48,7 @@
               </v-flex>
 
               <v-flex xs12 md3 p5>
-                <v-card ripple raised class="card4" height=200>
+                <v-card ripple class="card4" height=200>
                   <v-layout row wrap fill-height class="m0">
                     <v-flex d-flex align-center justify-center xs12>
                       <div>
@@ -140,18 +140,18 @@ export default {
       return {
         chart: {
           type: 'spline',
-          backgroundColor: this.darkMode ? '#424242' : '#FFF' ,
+          backgroundColor: this.darkMode ? '#424242' : '#f0f8ff5c' ,
         },
         title: {
           text: 'User registration metrics',
           style: {
-            color: this.darkMode ? '#FFF' : '#424242',
+            color: this.darkMode ? '#f0f8ff5c' : '#424242',
           }
         },
         subtitle: {
           text: 'Source: Database',
           style: {
-            color: this.darkMode ? '#FFF' : '#424242'
+            color: this.darkMode ? '#f0f8ff5c' : '#424242'
           }
         },
         xAxis: {
@@ -163,7 +163,7 @@ export default {
           title: {
             text: 'Number of users',
             style: {
-              color: this.darkMode ? '#FFF' : '#424242'
+              color: this.darkMode ? '#f0f8ff5c' : '#424242'
             }
           },
           labels: {
@@ -171,7 +171,7 @@ export default {
               return this.value + '°';
             },
             style: {
-              color: this.darkMode ? '#FFF' : '#424242'
+              color: this.darkMode ? '#f0f8ff5c' : '#424242'
             }
           }
         },
@@ -233,6 +233,10 @@ export default {
  .analytics .v-card__title {
    border-bottom: 1px solid #cacaca;
    /* box-shadow: 0px 2px 1px 0px #b9b9b9 */
+ }
+
+ .dark.analytics .v-card__title {
+   border-bottom: 1px solid #313131 !important;
  }
 
  .analytics .v-card-text {

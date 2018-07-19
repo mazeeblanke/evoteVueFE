@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import user from './modules/user'
+import campaign from './modules/campaign'
 import app from './modules/app'
 import auth from './modules/auth'
 import createPersistedState from "vuex-persistedstate";
@@ -12,6 +13,7 @@ const store = new Vuex.Store({
   modules: {
     app,
     auth,
+    campaign,
     user
   }
 })

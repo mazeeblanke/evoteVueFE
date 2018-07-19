@@ -6,6 +6,7 @@
       app
       prominent
       :height=60
+      :color="darkMode? '#00000' : '#f5f5f5'"
     >
       <v-toolbar-side-icon @click.stop="TOGGLE_DRAWER"></v-toolbar-side-icon>
       <v-toolbar-title class="mr-5 align-center">

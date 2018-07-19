@@ -17,6 +17,7 @@
     "vue": "^2.5.16",
     "vue-axios": "^2.1.2",
     "vue-core-image-upload": "^2.3.10",
+    "vue-progressbar": "^0.7.5",
     "vue-router": "^3.0.1",
     "vue2-highcharts": "^1.2.4",
     "vuelidate": "^0.7.4",

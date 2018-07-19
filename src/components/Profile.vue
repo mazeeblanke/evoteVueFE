@@ -4,8 +4,10 @@
 
       <v-flex xs10>
         <v-card>
-          <h3 class="headline m-10">PROFILE</h3>
-          <v-card-title>
+          <v-card-title class="card-gradient">
+            <h3 class="headline m-10">PROFILE</h3>
+          </v-card-title>
+          <v-card-text>
             <v-layout row wrap md12 xs12>
 
               <v-flex xs12 md5 p20>
@@ -107,7 +109,7 @@
 
             </v-layout>
 
-          </v-card-title>
+          </v-card-text>
 
           <v-card-actions>
             <v-spacer></v-spacer>

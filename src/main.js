@@ -6,14 +6,25 @@ import router from './router'
 import store from './store'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
-// import Buefy from 'buefy'
-// import 'buefy/lib/buefy.css'
+import VueProgressBar from 'vue-progressbar'
 
-// console.log(Buefy)
+const options = {
+  // color: '#bffaf3',
+  color: '#FF9800',
+  failedColor: '#874b4b',
+  thickness: '3px',
+  transition: {
+    speed: '0.2s',
+    opacity: '0.6s',
+    termination: 300
+  },
+  autoRevert: true,
+  location: 'top',
+  inverse: false
+}
 
-// Vue.component(Buefy.Snackbar.name, Buefy.Snackbar)
+Vue.use(VueProgressBar, options)
 
-// Vue.use(Buefy)
 Vue.use(VueAxios, axios)
 
 window.clBaseURL = 'https://res.cloudinary.com/dpisximfc/image/upload/w_120,h_120,c_fill,g_auto,q_auto,f_auto/'
