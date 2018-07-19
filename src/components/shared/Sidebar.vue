@@ -93,8 +93,8 @@ export default {
           title: 'Vote Management',
           active: true,
           items: [
-            { icon: 'add', title: 'Create Campaigns', route: { name: 'Campaigns' } },
-            { icon: 'visibility', title: 'View Vote Campaigns', route: 'e' },
+            { icon: 'add', title: 'Create Campaigns', route: 'd' },
+            { icon: 'visibility', title: 'View Vote Campaigns', route: { name: 'Campaigns' }},
             { icon: 'history', title: 'View Vote Results', route: 'f' }
           ]
         }
