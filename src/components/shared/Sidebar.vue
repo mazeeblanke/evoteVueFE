@@ -22,7 +22,7 @@
         </v-list-tile>
         <v-subheader class="mt-3 grey--text text--darken-1">ADMIN PANEL</v-subheader>
         <v-list>
-          <v-list-tile @click="">
+          <v-list-tile ripple exact-active-class="active" :to="{ name : 'Analytics' }">
             <v-list-tile-content>
               <v-list-tile-title>Dashboard</v-list-tile-title>
               <v-list-tile-sub-title>Quick review metrics</v-list-tile-sub-title>

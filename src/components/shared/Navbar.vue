@@ -4,7 +4,6 @@
       fixed
       clipped-left
       app
-      dark
       prominent
       :height=60
     >

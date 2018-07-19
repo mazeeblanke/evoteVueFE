@@ -1,7 +1,7 @@
 <template>
   <v-container :fluid="true" :fill-height="false">
     <v-layout align-center justify-center>
-      <v-flex xs10>
+      <v-flex xs12>
         <v-card raised>
           <v-card-title>
             <h3 class="headline m-10">USERS</h3>

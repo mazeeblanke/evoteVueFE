@@ -22,25 +22,30 @@ export default new Router({
                 component: () => import('@/components/auth/LoginForm'),
                 name: 'login',
                 meta: {}
-            } 
+            }
         ]
-    },  
+    },
     {
         path: '/dashboard',
         name: 'route',
         component: () => import('@/components/Dashboard'),
         children: [
-            { 
-                path: 'profile', 
-                component: () => import('@/components/Profile'),
-                name: 'Profile' 
+            {
+              path: 'profile',
+              component: () => import('@/components/Profile'),
+              name: 'Profile'
             },
-            { 
-                path: 'users', 
-                component: () => import('@/components/Users'),
-                name: 'Users' 
-            }
+            {
+              path: 'users',
+              component: () => import('@/components/Users'),
+              name: 'Users'
+            },
+            {
+              path: 'analytics',
+              component: () => import('@/components/Analytics'),
+              name: 'Analytics'
+          }
         ],
-    } 
+    }
   ]
 })
