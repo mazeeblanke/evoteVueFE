@@ -18,6 +18,7 @@
     "vue-axios": "^2.1.2",
     "vue-core-image-upload": "^2.3.10",
     "vue-router": "^3.0.1",
+    "vue2-highcharts": "^1.2.4",
     "vuelidate": "^0.7.4",
     "vuetify": "^1.0.19",
     "vuetify-cloudinary-upload": "^0.1.1",

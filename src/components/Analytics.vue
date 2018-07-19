@@ -67,11 +67,12 @@
     <v-layout row wrap>
       <v-flex xs12 md6 p0>
         <v-flex xs12 md12>
-          <v-card height=250>
+          <v-card height=400>
+            <vue-highcharts :options="options" ref="lineCharts"></vue-highcharts>
           </v-card>
         </v-flex>
         <v-flex xs12 md12>
-          <v-card height=250>
+          <v-card height=100>
           </v-card>
         </v-flex>
       </v-flex>
@@ -119,10 +120,86 @@ import {
   mapState,
   mapActions
 } from 'vuex'
+import VueHighcharts from 'vue2-highcharts'
+
+const asyncData = {
+  name: 'Months',
+  marker: {
+    symbol: 'circle'
+  },
+  data: [7.0, 6.9, 9.5, 14.5, 18.2, 21.5, 25.2, 26.5, 23.3, 18.3, 13.9, 9.6]
+}
 
 export default {
   computed: {
     ...mapState('user', ['users']),
+
+    ...mapState('app', ['darkMode']),
+
+    options() {
+      return {
+        chart: {
+          type: 'spline',
+          backgroundColor: this.darkMode ? '#424242' : '#FFF' ,
+        },
+        title: {
+          text: 'User registration metrics',
+          style: {
+            color: this.darkMode ? '#FFF' : '#424242',
+          }
+        },
+        subtitle: {
+          text: 'Source: Database',
+          style: {
+            color: this.darkMode ? '#FFF' : '#424242'
+          }
+        },
+        xAxis: {
+          gridLineWidth: 0,
+          categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+        },
+        yAxis: {
+          gridLineWidth: 0,
+          title: {
+            text: 'Number of users',
+            style: {
+              color: this.darkMode ? '#FFF' : '#424242'
+            }
+          },
+          labels: {
+            formatter: function () {
+              return this.value + '°';
+            },
+            style: {
+              color: this.darkMode ? '#FFF' : '#424242'
+            }
+          }
+        },
+        tooltip: {
+          crosshairs: true,
+          shared: true
+        }
+      }
+    }
+  },
+
+  components: {
+    VueHighcharts
+  },
+
+  mounted () {
+    this.load()
+  },
+
+  methods: {
+    load(){
+      let lineCharts = this.$refs.lineCharts;
+      // lineCharts.delegateMethod('showLoading', 'Loading...');
+      setTimeout(() => {
+          lineCharts.addSeries(asyncData);
+          lineCharts.hideLoading();
+      }, 2000)
+    }
   },
 
   data() {
@@ -155,7 +232,7 @@ export default {
 <style>
  .analytics .v-card__title {
    border-bottom: 1px solid #cacaca;
-   box-shadow: 0px 2px 1px 0px #b9b9b9
+   /* box-shadow: 0px 2px 1px 0px #b9b9b9 */
  }
 
  .analytics .v-card-text {
@@ -163,18 +240,22 @@ export default {
  }
 
  .analytics .card4 {
-   background-color: #E91E63
+   /* background-color: #E91E63 */
+   background: radial-gradient(#b7004c, #E91E63)
  }
 
  .analytics .card3 {
-   background-color: #03A9F4 !important
+   /* background-color: #03A9F4 !important */
+   background: radial-gradient(#0080bd, #3F51B5) !important
  }
 
  .analytics .card2 {
-   background-color: #607D8B !important
+   /* background-color: #607D8B !important */
+   background: radial-gradient(#607D8B, #4a4a4a) !important
  }
 
  .analytics .card1 {
-   background-color: #9E9E9E !important
+   /* background-color: #9E9E9E !important */
+   background: radial-gradient(#006596, #673AB7) !important
  }
 </style>

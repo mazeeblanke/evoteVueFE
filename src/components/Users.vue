@@ -266,7 +266,7 @@
             })
         },
 
-        // deep: true
+        deep: true
       }
 
     },

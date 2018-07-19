@@ -96,25 +96,13 @@
               </v-flex>
 
               <v-flex xs12 md2 p20>
-                <!-- <v-avatar :tile="false" :size=150 color="grey lighten-4">
-                  <img class="is-rounded-circle avatar" src="http://via.placeholder.com/50x50" alt="avatar">
-                </v-avatar> -->
                 <v-cloudinary-upload
                   v-model="image"
                   upload-preset="qddsi9lo"
                   cloud-name="dpisximfc"
                   ref="cloudinaryUpload"
+                  class="cloudinaryUpload"
                 />
-                <!-- <vue-core-image-upload
-                  crop-ratio="1:1"
-                  class="btn btn-primary"
-                  resize="local"
-                  url="http://101.198.151.190/api/upload.php"
-                  extensions="png,jpeg,jpg"
-                  text="Resize Image"
-                  compress="20"
-                  @imageuploaded="resizeLocalImageUploaded">
-                </vue-core-image-upload> -->
               </v-flex>
 
             </v-layout>
@@ -197,12 +185,7 @@
 
       image (newVal) {
         if (this.init === true) {
-          // this.user = {
-          //   ...this.user,
-          //   avatar: newVal ? `${clBaseURL}${newVal}` : ''
-          // }
           this.user.avatar = newVal ? `${clBaseURL}${newVal}` : '/'
-          console.log(this.user)
           this.submit()
         }
       }
@@ -212,10 +195,26 @@
 
 <style scoped>
   .avatar {
-
     height: 150px;
-
     width: 150px;
-
   }
 </style>
+
+<style>
+  .cloudinaryUpload {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .cloudinaryUpload img {
+    border-radius: 100%;
+    margin-bottom: 10px
+  }
+
+  .cloudinaryUpload {
+    text-align: center;
+  }
+</style>
+
