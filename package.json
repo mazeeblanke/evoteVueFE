@@ -11,6 +11,7 @@
     "axios": "^0.18.0",
     "buefy": "^0.6.6",
     "cloudinary-core": "^2.5.0",
+    "element-ui": "^2.4.4",
     "lodash": "^4.17.10",
     "node-sass": "^4.9.2",
     "sass-loader": "^7.0.3",

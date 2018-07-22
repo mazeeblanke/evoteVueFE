@@ -44,6 +44,12 @@ export default new Router({
           name: 'Campaigns'
         },
         {
+          path: 'campaigns/:id',
+          component: () => import('@/components/campaigns/CampaignView'),
+          name: 'Campaign',
+          params: true
+        },
+        {
           path: 'analytics',
           component: () => import('@/components/Analytics'),
           name: 'Analytics'

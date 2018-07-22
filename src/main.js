@@ -7,6 +7,12 @@ import store from './store'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
 import VueProgressBar from 'vue-progressbar'
+import {
+  Select,
+  Option
+} from 'element-ui'
+
+import 'element-ui/lib/theme-chalk/index.css'
 
 const options = {
   // color: '#bffaf3',
@@ -23,6 +29,8 @@ const options = {
   inverse: false
 }
 
+Vue.use(Select)
+Vue.use(Option)
 Vue.use(VueProgressBar, options)
 
 Vue.use(VueAxios, axios)

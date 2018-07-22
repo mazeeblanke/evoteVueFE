@@ -25,7 +25,8 @@ import {
   VSnackbar,
   VSwitch,
   VDivider,
-  transitions
+  transitions,
+  VTextarea,
 } from 'vuetify'
 import 'vuetify/src/stylus/app.styl'
 
@@ -55,6 +56,7 @@ Vue.use(Vuetify, {
     VIcon,
     VGrid,
     VToolbar,
-    transitions
+    transitions,
+    VTextarea,
   },
 })

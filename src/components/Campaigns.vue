@@ -4,7 +4,7 @@
       <v-flex xs12>
         <v-card raised :height=800>
           <v-card-title class="card-gradient">
-            <h3 class="headline">Campaigns</h3>
+            <h3 class="headline">CAMPAIGNS</h3>
             <v-spacer></v-spacer>
             <v-layout justify-end>
               <v-flex justify-end align-end md5 p5>
@@ -15,16 +15,9 @@
                   single-line hide-details
                 ></v-text-field>
               </v-flex>
-              <!-- <v-flex justify-end align-end md3 p5>
-                <v-select
-                  v-model="pagination.confirmed"
-                  item-text="text"
-                  item-value="value"
-                  :items="confirmation_statuses"
-                  label="Confirmation status"
-                  clearable
-                ></v-select>
-              </v-flex> -->
+              <v-flex d-flex justify-end align-end md2>
+                <v-btn slot="activator" @click="showCampaignForm" dark>New Campaign</v-btn>
+              </v-flex>
             </v-layout>
           </v-card-title>
           <v-data-table
@@ -51,28 +44,21 @@
             </template>
             <template slot="items" slot-scope="props">
               <tr
-                :active="props.selected"
-                @click="props.selected = !props.selected"
+                @click.stop.prevent="showCampaign(props.item.id)"
               >
-                <td>
-                  <v-checkbox
-                    :input-value="props.selected"
-                    primary hide-details
-                  ></v-checkbox>
-                </td>
                 <td>{{ props.item.id }}</td>
-                <td>{{ props.item.campaignname }}</td>
-                <td>{{ props.item.email }}</td>
-                <td>{{ props.item.phone }}</td>
-                <td>{{ props.item.confirmed }}</td>
+                <td>{{ props.item.name }}</td>
+                <td>{{ props.item.description }}</td>
+                <td>{{ props.item.start_date }}</td>
+                <td>{{ props.item.end_date }}</td>
                 <td>{{ props.item.created_at }}</td>
-                <td class="justify-center layout px-0">
-                  <v-icon small class="mr-2" @click="editItem(props.item)">
+                <td>
+                  <v-icon small class="mr-2" @click.stop.prevent="editItem(props.item)">
                     edit
                   </v-icon>
-                  <!-- <v-icon small @click="deleteItem(props.item)">
+                  <v-icon small @click="deleteItem(props.item)">
                     delete
-                  </v-icon> -->
+                  </v-icon>
                 </td>
               </tr>
             </template>
@@ -82,76 +68,16 @@
               </div>
             </v-alert>
           </v-data-table>
-          <v-dialog v-model="dialog" max-width="800px">
-            <v-card>
-              <v-card-title>
-                <span class="headline">Edit Campaign</span>
-              </v-card-title>
-              <v-card-text>
-                <v-container grid-list-md>
-                  <v-layout wrap>
-                    <v-flex xs12 sm6 md4>
-                      <v-text-field
-                        v-model="editedItem.firstname"
-                        label="First name"
-                        box
-                        clearable
-                        disabled
-                      ></v-text-field>
-                    </v-flex>
-                    <v-flex xs12 sm6 md4>
-                      <v-text-field
-                        v-model="editedItem.lastname"
-                        label="Last name"
-                        box
-                        clearable
-                        disabled
-                      ></v-text-field>
-                    </v-flex>
-                      <v-flex xs12 sm6 md4>
-                        <v-text-field
-                          v-model="editedItem.campaignname"
-                          label="Campaignname"
-                          box
-                          clearable
-                          disabled
-                        ></v-text-field>
-                      </v-flex>
-                      <v-flex xs12 sm6 md4>
-                        <v-text-field
-                          v-model="editedItem.email"
-                          label="Email"
-                          box
-                          clearable
-                          disabled
-                        ></v-text-field>
-                      </v-flex>
-                      <v-flex xs12 sm6 md4>
-                        <!-- <v-select
-                          :items="confirmation_statuses"
-                          v-model="editedItem.confirmed"
-                          item-text="text"
-                          item-value="value"
-                          label="Verification status"
-                          box
-                          clearable
-                        ></v-select> -->
-                      </v-flex>
-                  </v-layout>
-                </v-container>
-              </v-card-text>
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn depressed @click.native="close">Cancel</v-btn>
-                <v-btn depressed :loading="verifying"  @click.native="save">Save</v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
-          <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn flat>Cancel</v-btn>
-              <v-btn flat>Submit</v-btn>
-          </v-card-actions>
+          <CampaignForm
+            :errors="errors"
+            :edited-item="editedItem"
+            @change="(newValue) => this.editedItem = editedItem"
+            :save="save"
+            :close="close"
+            :dialog.sync="dialog"
+            :saving="saving"
+            v-if="dialog"
+          ></CampaignForm>
         </v-card>
       </v-flex>
     </v-layout>
@@ -179,20 +105,42 @@
   } from 'vuex'
 
   import _ from 'lodash'
+  import CampaignForm from '@/components/campaigns/CampaignForm'
 
   export default {
 
     computed: {
-      ...mapState('campaign', ['campaigns']),
+      ...mapState ('campaign', ['campaigns']),
+    },
+
+    components: {
+      CampaignForm
     },
 
     methods: {
+      ...mapActions ('campaign', [
+        'loadCampaigns',
+        'updateCampaign',
+        'createCampaign'
+      ]),
 
-      ...mapActions('campaign', ['loadCampaigns', 'verifyCampaign']),
+      showCampaign (id) {
+        this.$router.push(`/dashboard/campaigns/${parseInt(id, 10)}`)
+        // this.$router.push('dashboard/campaigns')
+        // this.$router.push({
+        //   params: { id: parseInt(id, 10) },
+        //   path: `dashboard/campaigns/${parseInt(id, 10)}`
+        // })
+      },
 
-      editItem(item) {
+      editItem (item) {
         this.editedIndex = this.campaigns.data.indexOf(item)
         this.editedItem = Object.assign({}, item)
+        this.dialog = true
+      },
+
+      showCampaignForm () {
+        this.editedItem = {}
         this.dialog = true
       },
 
@@ -202,12 +150,12 @@
         }, 500)()
       },
 
-      deleteItem(item) {
-        const index = this.campaigns.data.indexOf(item)
-        confirm('Are you sure you want to delete this item?') && this.campaigns.data.splice(index, 1)
+      deleteItem (item) {
+        // const index = this.campaigns.data.indexOf(item)
+        // confirm('Are you sure you want to delete this item?') && this.campaigns.data.splice(index, 1)
       },
 
-      close() {
+      close () {
         this.dialog = false
         setTimeout(() => {
           this.editedItem = {}
@@ -215,29 +163,33 @@
         }, 300)
       },
 
-      save() {
-        this.verifying = true
-        this.verifyCampaign({
-          confirmed: this.editedItem.confirmed,
-          campaignId: this.editedItem.id
-        })
+      save () {
+        this.saving = true
+        const doAction = this.editedItem.created_at
+          ? this.updateCampaign
+          : this.createCampaign
+        doAction(this.editedItem)
         .then(() => {
           this.close()
-          this.snackbarText = "Succesfully updated campaign!"
+          this.snackbarText = this.editedItem.created_at
+            ? "Succesfully updated campaign!"
+            : "Succesfully created campaign!"
           this.snackbar = true
-          this.verifying = false
+          this.saving = false
+          this.errors = []
         })
-        .catch(() => {
-          this.verifying = false
+        .catch((err) => {
+          this.saving = false
+          console.log(err.response.data)
+          this.errors = err.response.data.message
         })
       }
 
     },
 
     watch: {
-
       pagination: {
-        handler() {
+        handler () {
           this.loading = true
           const {
             page,
@@ -252,7 +204,7 @@
             confirmed,
           }
 
-          this.loadCampaigns(this.filter)
+          this.loadCampaigns (this.filter)
             .then(() => {
               this.loading = false
             })
@@ -260,10 +212,8 @@
               this.loading = false
             })
         },
-
         deep: true
       }
-
     },
 
     mounted () {
@@ -280,8 +230,9 @@
 
     data () {
       return {
+        errors: [],
         loading: false,
-        verifying: false,
+        saving: false,
         snackbar: false,
         snackbarText: null,
         editedIndex: null,
@@ -292,16 +243,6 @@
           'value': -1
         }],
         search: null,
-        // confirmation_statuses: [
-        //   {
-        //     value: true,
-        //     text: 'Verified'
-        //   },
-        //   {
-        //     value: false,
-        //     text: 'Unverified'
-        //   },
-        // ],
         total: 0,
         pagination: {},
         filter: {
@@ -314,16 +255,16 @@
             text: 'ID'
           },
           {
-            text: 'Campaignname'
+            text: 'Name'
           },
           {
-            text: 'Email'
+            text: 'Description'
           },
           {
-            text: 'Phone'
+            text: 'Start Date'
           },
           {
-            text: 'Confirmed'
+            text: 'End Date'
           },
           {
             text: 'Created At',

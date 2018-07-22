@@ -29,6 +29,7 @@ const actions = {
     loadUsers ({ commit }, payload) {
         return Vue.axios.get('users', { params: payload }).then((res) => {
           commit('SET_USERS', res.data)
+          return res.data
         })
     },
 

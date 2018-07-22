@@ -4,7 +4,7 @@
       <v-flex xs12>
         <v-card raised :height=800>
           <v-card-title class="card-gradient">
-            <h3 class="headline">Users</h3>
+            <h3 class="headline">USERS</h3>
             <v-spacer></v-spacer>
             <v-layout justify-end>
               <v-flex justify-end align-end md5 p5>
@@ -155,11 +155,6 @@
               </v-card-actions>
             </v-card>
           </v-dialog>
-          <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn flat>Cancel</v-btn>
-              <v-btn flat>Submit</v-btn>
-          </v-card-actions>
         </v-card>
       </v-flex>
     </v-layout>

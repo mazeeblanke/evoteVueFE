@@ -5,8 +5,9 @@
       clipped
       app
     >
-      <v-list dense>
+      <v-list>
         <v-list-tile
+          ripple
           :to="item.route"
           v-for="item in items"
           :key="item.text"
@@ -42,6 +43,7 @@
             </v-list-tile>
 
             <v-list-tile
+              ripple
               :to="subItem.route"
               v-for="subItem in item.items"
               :key="subItem.title"
@@ -93,8 +95,8 @@ export default {
           title: 'Vote Management',
           active: true,
           items: [
-            { icon: 'add', title: 'Create Campaigns', route: 'd' },
-            { icon: 'visibility', title: 'View Vote Campaigns', route: { name: 'Campaigns' }},
+            // { icon: 'add', title: 'Create Campaigns', route: 'd' },
+            { icon: 'visibility', title: 'Campaigns', route: { name: 'Campaigns' }},
             { icon: 'history', title: 'View Vote Results', route: 'f' }
           ]
         }

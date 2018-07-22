@@ -62,7 +62,7 @@
                   <v-list-tile-action>
                     <v-switch @click.native="TOGGLE_DARK_MODE" :value="darkMode" color="indigo"></v-switch>
                   </v-list-tile-action>
-                  <v-list-tile-title>Dark mode</v-list-tile-title>
+                  <v-list-tile-title>Night mode</v-list-tile-title>
                 </v-list-tile>
               </v-list>
 
