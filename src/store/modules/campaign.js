@@ -30,6 +30,10 @@ const mutations = {
       ]
     },
 
+    ADD_CAMPAIGN_POSITION_NORMINEES (state, {data}) {
+      console.log(data)
+    },
+
     UPDATE_SELECTED_CAMPAIGN (state, {data}) {
       let foundCampaignIndex = state
       .campaigns
@@ -78,8 +82,14 @@ const actions = {
       })
     },
 
+    addCampaignPositionNorminees ({ commit }, payload) {
+      return Vue.axios.post('campaign-position-norminations', payload).then((res) => {
+        commit('ADD_CAMPAIGN_POSITION_NORMINEES', res.data)
+        return res.data.data
+      })
+    },
+
     updateCampaignPosition ({ commit }, payload) {
-      console.log(payload)
       return Vue.axios.patch(`campaign-positions/${payload.id}`, payload).then((res) => {
         commit('UPDATE_SELECTED_CAMPAIGN_POSITION', res.data)
         return res.data

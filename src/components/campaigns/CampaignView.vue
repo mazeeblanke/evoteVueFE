@@ -69,10 +69,10 @@
             </v-data-table>
           </v-flex>
           <v-flex xs3 sm3 md3 class="detail">
-            <template v-if="campaignPositionUnderReview && campaignPositionUnderReview.norminations.length">
+            <template v-if="campaignPositionUnderReview">
               <h6 class="headline">Norminees for {{ campaignPositionUnderReview.name }}</h6>
               <v-icon :style="{'margin-left': '15px'}" @click="normineeDialog = true " color="grey darken-1">add_circle_outline</v-icon>
-              <v-list>
+              <v-list v-if="campaignPositionUnderReview.norminations.length">
                 <template v-for="(item) in campaignPositionUnderReview.norminations">
                   <v-list-tile
                     :key="item.id"
@@ -84,12 +84,17 @@
                     </v-list-tile-avatar>
                     <v-list-tile-content>
                       <v-list-tile-title>{{ item.votee.username }}</v-list-tile-title>
-                      <v-list-tile-sub-title class="text--primary">{{ item.votee.firstname + ' ' + item.votee.lastname }}</v-list-tile-sub-title>
+                      <v-list-tile-sub-title
+                        v-if="item.votee.firstname && item.votee.lastname"
+                        class="text--primary">
+                          {{ item.votee.firstname + ' ' + item.votee.lastname }}
+                      </v-list-tile-sub-title>
                       <!-- <v-list-tile-sub-title>{{ item.subtitle }}</v-list-tile-sub-title> -->
                     </v-list-tile-content>
                   </v-list-tile>
                 </template>
               </v-list>
+              <EmptyState v-else :style="{ height: '100%'}" empty-text="No norminees yet!"></EmptyState>
             </template>
             <EmptyState v-else :style="{ height: '100%'}" empty-text="No norminees yet!"></EmptyState>
           </v-flex>
@@ -109,6 +114,7 @@
             :errors="errors"
             :norminees.sync="norminees"
             :save="saveNorminees"
+            @change="(newValue) => this.norminees = newValue"
             :close="close"
             :dialog.sync="normineeDialog"
             :saving="saving"
@@ -148,7 +154,7 @@ export default {
     ...mapActions ('campaign', [
       'loadCampaign',
       'updateCampaignPosition',
-      'createCampaignPosition'
+      'addCampaignPositionNorminees'
     ]),
 
     editItem (item) {
@@ -175,6 +181,7 @@ export default {
 
     close () {
       this.dialog = false
+      this.normineeDialog = false
       setTimeout(() => {
         this.editedItem = {}
         this.editedIndex = -1
@@ -216,21 +223,20 @@ export default {
 
     saveNorminees () {
       this.saving = true
-      let payload = this.norminees
+      let payload = {
+        campaign_position_id: this.campaignPositionUnderReview.id,
+        norminations: this.norminees.map(norminee_id => ({
+          votee_id: norminee_id,
+          campaign_id: this.campaignPositionUnderReview.campaign_id
+        }))
+      }
 
-      // if (!this.editedItem.created_at) {
-      //   payload = {
-      //     campaign_id: this.selectedCampaign.id,
-      //     positions: [this.editedItem]
-      //   }
-      // }
+      // const doAction = this.editedItem.created_at
+      //   ? this.updateCampaignPosition
+      //   : this.createCampaignPosition
 
-      const doAction = this.editedItem.created_at
-        ? this.updateCampaignPosition
-        : this.createCampaignPosition
-
-      doAction(payload)
-      .then(() => {
+      this.addCampaignPositionNorminees(payload)
+      .then((res) => {
         this.close()
         this.snackbarText = this.editedItem.created_at
           ? "Succesfully added norminees!"
@@ -238,6 +244,11 @@ export default {
         this.snackbar = true
         this.saving = false
         this.errors = []
+        console.log(res)
+        this.campaignPositionUnderReview.norminations = [
+          ...this.campaignPositionUnderReview.norminations,
+          ...res
+        ]
       })
       .catch((err) => {
         console.log(err)

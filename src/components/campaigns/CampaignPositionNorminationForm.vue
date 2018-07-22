@@ -121,9 +121,9 @@ export default {
   },
 
   watch: {
-    // editedItem (newValue) {
-    //   this.$emit('change', newValue)
-    // }
+    norminees (newValue) {
+      this.$emit('change', newValue)
+    }
   }
 }
 </script>
