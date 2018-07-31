@@ -48,10 +48,18 @@
               :pagination.sync="pagination"
               :total-items="selectedCampaign.campaign_positions.length"
               :loading="loading"
-              :headers-length=7
+              :headers-length=8
             >
               <template slot="headers" slot-scope="props">
                 <tr>
+                  <th>
+                    <v-checkbox
+                      :input-value="props.all"
+                      :indeterminate="props.indeterminate"
+                      primary
+                      hide-details
+                    ></v-checkbox>
+                  </th>
                   <th
                     v-for="header in props.headers"
                     :key="header.text"
@@ -64,6 +72,13 @@
               </template>
               <template slot="items" slot-scope="props">
                 <tr @click="campaignPositionUnderReview = props.item">
+                  <td>
+                    <v-checkbox
+                      v-if="props.item.id"
+                      :input-value="props.selected"
+                      primary hide-details
+                    ></v-checkbox>
+                  </td>
                   <td>{{ props.item.id }}</td>
                   <td>{{ props.item.name }}</td>
                   <td>{{ props.item.description }}</td>
@@ -120,7 +135,8 @@
                         <!-- <v-list-tile-sub-title>{{ item.subtitle }}</v-list-tile-sub-title> -->
                       </v-list-tile-content>
                       <v-list-tile-action>
-                        <v-icon @click="_deleteNorminee(item)" :style="{ cursor: 'pointer' }">delete</v-icon>
+                        <v-icon v-if="!item.deleting" @click="_deleteNorminee(item)" :style="{ cursor: 'pointer' }">delete</v-icon>
+                        <v-progress-linear v-else :indeterminate="true"></v-progress-linear>
                       </v-list-tile-action>
                     </v-list-tile>
                   </template>
@@ -219,6 +235,8 @@ export default {
     },
 
     _deleteNorminee (norminationItem) {
+      let norminations = this.campaignPositionUnderReview.norminations
+      let index = norminations.findIndex(n => n.votee_id === norminationItem.votee_id)
 
       this.$swal({
         title: 'Are you sure?',
@@ -228,6 +246,13 @@ export default {
         confirmButtonText: 'Yes'
       }).then((result) => {
         if (result.value) {
+          this.$set(
+            this.campaignPositionUnderReview.norminations[index],
+            'deleting',
+            true
+          )
+          this.campaignPositionUnderReview.norminations[index].deleting = true
+          console.log(this.campaignPositionUnderReview.norminations[index])
           let campaign_id = this.campaignPositionUnderReview.campaign_id
           console.log(campaign_id);
           this.deleteNorminee({
@@ -236,8 +261,8 @@ export default {
             'campaign_id' : this.campaignPositionUnderReview.campaign_id
           })
           .then((res) => {
-            let norminations = this.campaignPositionUnderReview.norminations;
-            let index = norminations.findIndex(n => n.votee_id === norminationItem.votee_id);
+            // let norminations = this.campaignPositionUnderReview.norminations;
+            // let index = norminations.findIndex(n => n.votee_id === norminationItem.votee_id);
 
             if (index) {
               this.campaignPositionUnderReview.norminations.splice(
@@ -471,7 +496,6 @@ export default {
 .scroll-area {
   position: relative;
   margin: auto;
-  width: 380px;
   height: 480px;
 }
 

@@ -43,10 +43,18 @@
             :pagination.sync="pagination"
             :total-items="campaigns.total"
             :loading="loading"
-            :headers-length=8
+            :headers-length=9
           >
             <template slot="headers" slot-scope="props">
               <tr>
+                <th>
+                  <v-checkbox
+                    :input-value="props.all"
+                    :indeterminate="props.indeterminate"
+                    primary
+                    hide-details
+                  ></v-checkbox>
+                </th>
                 <th
                   v-for="header in props.headers"
                   :key="header.text"
@@ -61,6 +69,13 @@
               <tr
                 @click.stop.prevent="showCampaign(props.item.id)"
               >
+                <td>
+                  <v-checkbox
+                    v-if="props.item.id"
+                    :input-value="props.selected"
+                    primary hide-details
+                  ></v-checkbox>
+                </td>
                 <td>{{ props.item.id }}</td>
                 <td>{{ props.item.name }}</td>
                 <td>{{ props.item.description }}</td>
