@@ -9,8 +9,14 @@ import VueAxios from 'vue-axios'
 import VueProgressBar from 'vue-progressbar'
 import {
   Select,
+  Carousel,
+  CarouselItem,
+  Radio,
   Option
 } from 'element-ui'
+import VueSweetalert2 from 'vue-sweetalert2';
+
+
 
 import 'element-ui/lib/theme-chalk/index.css'
 
@@ -30,8 +36,12 @@ const options = {
 }
 
 Vue.use(Select)
+Vue.use(Radio)
 Vue.use(Option)
+Vue.use(Carousel)
+Vue.use(CarouselItem)
 Vue.use(VueProgressBar, options)
+Vue.use(VueSweetalert2);
 
 Vue.use(VueAxios, axios)
 

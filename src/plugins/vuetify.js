@@ -24,8 +24,12 @@ import {
   VTextField,
   VSnackbar,
   VSwitch,
+  VStepper,
+  // VStepperstep,
+  // VSteppercontent,
   VDivider,
   transitions,
+  VBreadcrumbs,
   VTextarea,
 } from 'vuetify'
 import 'vuetify/src/stylus/app.styl'
@@ -33,6 +37,10 @@ import 'vuetify/src/stylus/app.styl'
 Vue.use(Vuetify, {
   components: {
     VApp,
+    VStepper,
+    // VStepperstep,
+    // VSteppercontent,
+    VBreadcrumbs,
     VSwitch,
     VDatePicker,
     VDivider,

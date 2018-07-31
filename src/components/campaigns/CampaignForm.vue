@@ -9,7 +9,7 @@
     <v-card-text>
       <v-container grid-list-md>
         <v-layout wrap>
-          <v-flex xs12 sm6 md4>
+          <v-flex xs12 sm6 md6>
             <v-text-field
               v-model="editedItem.name"
               label="Name"
@@ -18,7 +18,7 @@
               :error-messages="errors.name"
             ></v-text-field>
           </v-flex>
-          <v-flex xs12 sm6 md4>
+          <v-flex xs12 sm6 md6>
             <date-picker
               label="Start Date"
               :init-value="editedItem.start_date"
@@ -26,13 +26,25 @@
               @change="(date) => editedItem.start_date = date"
             ></date-picker>
           </v-flex>
-          <v-flex xs12 sm6 md4>
+          <v-flex xs12 sm6 md6>
             <date-picker
               label="End Date"
               :init-value="editedItem.end_date"
               :error-messages="errors.end_date"
               @change="(date) => editedItem.end_date = date"
             ></date-picker>
+          </v-flex>
+          <v-flex xs12 sm6 md6>
+            <v-select
+              :items="[{ text: 'Inactive', value: 0 }, { text: 'Active', value: 1}]"
+              v-model="editedItem.active"
+              item-text="text"
+              item-value="value"
+              label="Active"
+              :disabled="!editedItem.created_at"
+              box
+              clearable
+            ></v-select>
           </v-flex>
           <v-flex xs12 sm12 md12>
             <v-textarea

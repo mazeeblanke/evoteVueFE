@@ -3,6 +3,18 @@
     <v-layout align-center justify-center>
 
       <v-flex xs10>
+        <v-breadcrumbs divider="/">
+          <v-breadcrumbs-item
+            :to="{ name: UCFIRST(route) }"
+            active-class="is-white"
+            ripple
+            v-for="route in $route.path.split('/').filter(r => r)"
+            :key="route"
+            class="capitalize"
+          >
+            {{ route }}
+          </v-breadcrumbs-item>
+        </v-breadcrumbs>
         <v-card>
           <v-card-title class="card-gradient">
             <h3 class="headline m-10">PROFILE</h3>
@@ -127,6 +139,7 @@
   import { mapState, mapActions, mapMutations } from 'vuex'
   import VCloudinaryUpload from 'vuetify-cloudinary-upload'
   import _ from 'lodash'
+  import { UCFIRST } from '@/utils/helpers'
 
   export default {
     data () {
@@ -155,6 +168,10 @@
       ...mapActions('user', ['updateUser']),
 
       ...mapMutations('app', ['TOGGLE_SNACKBAR']),
+
+      ...{
+        UCFIRST
+      },
 
       submit () {
         this.saving = true

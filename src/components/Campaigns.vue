@@ -2,9 +2,24 @@
   <v-container :fluid="true" :fill-height="false">
     <v-layout align-center justify-center>
       <v-flex xs12>
+        <v-breadcrumbs divider="/">
+          <v-breadcrumbs-item
+            :to="{ name: UCFIRST(route) }"
+            active-class="is-white"
+            ripple
+            v-for="route in $route.path.split('/').filter(r => r)"
+            :key="route"
+            class="capitalize"
+          >
+            {{ route }}
+          </v-breadcrumbs-item>
+        </v-breadcrumbs>
         <v-card raised :height=800>
           <v-card-title class="card-gradient">
-            <h3 class="headline">CAMPAIGNS</h3>
+            <div class="is-flex">
+              <v-icon @click="$router.back()">arrow_left</v-icon>
+              <h3 class="headline">CAMPAIGNS</h3>
+            </div>
             <v-spacer></v-spacer>
             <v-layout justify-end>
               <v-flex justify-end align-end md5 p5>
@@ -22,7 +37,7 @@
           </v-card-title>
           <v-data-table
             :headers="headers"
-            :items="campaigns.data"
+            :items="formattedCampaigns"
             :search="search"
             :rows-per-page-items="perPageValues"
             :pagination.sync="pagination"
@@ -49,16 +64,19 @@
                 <td>{{ props.item.id }}</td>
                 <td>{{ props.item.name }}</td>
                 <td>{{ props.item.description }}</td>
+                <td>{{ props.item.active }}</td>
                 <td>{{ props.item.start_date }}</td>
                 <td>{{ props.item.end_date }}</td>
                 <td>{{ props.item.created_at }}</td>
                 <td>
-                  <v-icon small class="mr-2" @click.stop.prevent="editItem(props.item)">
-                    edit
-                  </v-icon>
-                  <v-icon small @click="deleteItem(props.item)">
-                    delete
-                  </v-icon>
+                  <template v-if="props.item.id">
+                    <v-icon small class="mr-2" @click.stop.prevent="editItem(props.item)">
+                      edit
+                    </v-icon>
+                    <v-icon small @click="deleteItem(props.item)">
+                      delete
+                    </v-icon>
+                  </template>
                 </td>
               </tr>
             </template>
@@ -106,11 +124,26 @@
 
   import _ from 'lodash'
   import CampaignForm from '@/components/campaigns/CampaignForm'
+  import { UCFIRST } from '@/utils/helpers'
 
   export default {
 
     computed: {
       ...mapState ('campaign', ['campaigns']),
+
+      formattedCampaigns () {
+        let length = this.campaigns.data.length
+        let pageSize = this.pagination.rowsPerPage
+        let emptyRowsLength = Math.abs(pageSize - length)
+        if (emptyRowsLength > 0) {
+          return [
+            ...this.campaigns.data,
+            ...Array(emptyRowsLength).fill({})
+          ].slice(0, pageSize)
+        }
+        return this.campaigns.data
+      }
+
     },
 
     components: {
@@ -123,6 +156,10 @@
         'updateCampaign',
         'createCampaign'
       ]),
+
+      ...{
+        UCFIRST
+      },
 
       showCampaign (id) {
         this.$router.push(`/dashboard/campaigns/${parseInt(id, 10)}`)
@@ -140,7 +177,9 @@
       },
 
       showCampaignForm () {
-        this.editedItem = {}
+        this.editedItem = {
+          active: 0
+        }
         this.dialog = true
       },
 
@@ -177,6 +216,7 @@
           this.snackbar = true
           this.saving = false
           this.errors = []
+          this.campaigns.total += 1
         })
         .catch((err) => {
           this.saving = false
@@ -238,10 +278,7 @@
         editedIndex: null,
         editedItem: {},
         dialog: false,
-        perPageValues: [10, 15, 20, {
-          'text': '$vuetify.dataIterator.rowsPerPageAll',
-          'value': -1
-        }],
+        perPageValues: [10],
         search: null,
         total: 0,
         pagination: {},
@@ -259,6 +296,9 @@
           },
           {
             text: 'Description'
+          },
+          {
+            text: 'Status'
           },
           {
             text: 'Start Date'

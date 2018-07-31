@@ -15,9 +15,10 @@
               multiple
               filterable
               remote
-              :style="{ width: '100%', background: '#424242' }"
+              clearable
+              :style="{ width: '100%', background: '#424242', color: 'white' }"
               reserve-keyword
-              placeholder="Please enter a keyword"
+              placeholder="Start typing user's name..."
               :remote-method="fetchUsers"
               :loading="loading">
               <el-option
@@ -73,6 +74,9 @@ export default {
       type: Boolean,
       required: true
     },
+    campaignId: {
+      required: false
+    },
     saving: {
       type: Boolean,
       required: true
@@ -105,7 +109,10 @@ export default {
     fetchUsers(query) {
       if (query !== '') {
         this.loading = true;
-        this.loadUsers()
+        this.loadUsers({
+          search: query,
+          campaignId: this.campaignId
+        })
         .then((res) => {
           this.userSuggestions = res.data
           this.loading = false

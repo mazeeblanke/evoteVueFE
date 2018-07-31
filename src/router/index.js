@@ -34,6 +34,11 @@ export default new Router({
           name: 'Profile'
         },
         {
+          path: 'vote',
+          component: () => import('@/components/Vote'),
+          name: 'Vote'
+        },
+        {
           path: 'users',
           component: () => import('@/components/Users'),
           name: 'Users'
@@ -52,7 +57,8 @@ export default new Router({
         {
           path: 'analytics',
           component: () => import('@/components/Analytics'),
-          name: 'Analytics'
+          // name: 'Analytics'
+          name: 'Dashboard'
         }
       ],
     }

@@ -2,9 +2,24 @@
   <v-container :fluid="true" :fill-height="false">
     <v-layout align-center justify-center>
       <v-flex xs12>
+        <v-breadcrumbs divider="/">
+          <v-breadcrumbs-item
+            :to="{ name: UCFIRST(route) }"
+            active-class="is-white"
+            ripple
+            v-for="route in $route.path.split('/').filter(r => r)"
+            :key="route"
+            class="capitalize"
+          >
+            {{ route }}
+          </v-breadcrumbs-item>
+        </v-breadcrumbs>
         <v-card raised :height=800>
           <v-card-title class="card-gradient">
-            <h3 class="headline">USERS</h3>
+            <div class="is-flex">
+              <v-icon @click="$router.back()">arrow_left</v-icon>
+              <h3 class="headline">USERS</h3>
+            </div>
             <v-spacer></v-spacer>
             <v-layout justify-end>
               <v-flex justify-end align-end md5 p5>
@@ -182,6 +197,7 @@
   } from 'vuex'
 
   import _ from 'lodash'
+  import { UCFIRST } from '@/utils/helpers'
 
   export default {
 
@@ -192,6 +208,10 @@
     methods: {
 
       ...mapActions('user', ['loadUsers', 'verifyUser']),
+
+      ...{
+        UCFIRST
+      },
 
       editItem(item) {
         this.editedIndex = this.users.data.indexOf(item)
@@ -290,10 +310,7 @@
         editedIndex: null,
         editedItem: {},
         dialog: false,
-        perPageValues: [10, 15, 20, {
-          'text': '$vuetify.dataIterator.rowsPerPageAll',
-          'value': -1
-        }],
+        perPageValues: [10],
         search: null,
         confirmation_statuses: [
           {

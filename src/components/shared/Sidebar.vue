@@ -23,7 +23,7 @@
         </v-list-tile>
         <v-subheader class="mt-3 grey--text text--darken-1">ADMIN PANEL</v-subheader>
         <v-list>
-          <v-list-tile ripple exact-active-class="active" :to="{ name : 'Analytics' }">
+          <v-list-tile ripple exact-active-class="active" :to="{ name : 'Dashboard' }">
             <v-list-tile-content>
               <v-list-tile-title>Dashboard</v-list-tile-title>
               <v-list-tile-sub-title>Quick review metrics</v-list-tile-sub-title>
@@ -80,6 +80,7 @@ export default {
     return {
       items: [
         { icon: 'account_box', text: 'Profile', route: { name: 'Profile' } },
+        { icon: 'history', text: 'Vote', route: { name: 'Vote' } },
         { icon: 'history', text: 'Live Vote Results', route: 'b' },
       ],
       items2: [

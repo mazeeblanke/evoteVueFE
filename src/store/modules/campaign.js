@@ -25,8 +25,8 @@ const mutations = {
 
     ADD_CAMPAIGN_POSITION (state, {data}) {
       state.selectedCampaign.campaign_positions = [
-        ...state.selectedCampaign.campaign_positions,
-        ...data
+        ...data,
+        ...state.selectedCampaign.campaign_positions
       ]
     },
 
@@ -61,9 +61,17 @@ const actions = {
         })
     },
 
+    deleteNorminee ({ commit }, payload) {
+      return Vue.axios.delete(`campaign-position-norminations/${payload.campaign_position_id}`, { data: payload })
+      .then((res) => {
+        return res.data
+      })
+    },
+
     loadCampaign ({ commit }, payload) {
       return Vue.axios.get(`campaigns/${payload.id}`).then((res) => {
         commit('SET_SELECTED_CAMPAIGN', res.data)
+        return res.data
       })
     },
 

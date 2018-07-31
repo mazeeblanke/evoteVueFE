@@ -3,9 +3,27 @@
   display: flex
   justify-content: center
 
+.is-v-centered
+  display: flex
+  flex-direction: column
+  justify-content: center
+  align-items: center
+
 .is-full-height
   height: 100vh
   width: 100vw
+
+.has-text-centered
+  text-align: center !important
+
+.is-flex
+  display: flex
+
+.capitalize
+  text-transform: capitalize  !important
+
+.is-white
+  color: white !important
 
 .is-rounded-circle, .v-avatar
   border-radius: 100%
@@ -28,8 +46,8 @@
 .p20
   padding: 20px !important
 
-.headline
-  padding: 30px 5px 0px 35px
+// .headline
+//   padding: 30px 5px 0px 35px
 
 .mt-20
   margin-top: 20px
@@ -74,9 +92,25 @@
 .headline
   font-size: 20px !important
 
+// .theme--dark .v-stepper,
+// .application .theme--dark.v-stepper ,
+// .theme--dark .v-card,
+//   background: #303030 !important
+
+.theme--dark .v-card, .application .theme--dark.v-card,
+.theme--dark .v-table, .application .theme--dark.v-table,
+.theme--dark .v-datatable .v-datatable__actions, .application .theme--dark.v-datatable .v-datatable__actions,
+.theme--dark .detail .v-list
+   background: #383838 !important
 
 .v-text-field .v-label
   font-size: 14px !important
+
+.v-stepper__step
+  cursor: pointer !important
+
+.v-breadcrumbs__item
+  color: #d0d0d0 !important
 
 .v-avatar img
   display: inline-block !important
@@ -101,10 +135,21 @@
 .el-select-dropdown__item.selected,
 .el-select-dropdown__list,
 .el-select-dropdown__empty
-	background-color: #333 !important
+	background-color: #424242 !important
+
+.el-select-dropdown__item
+  color: #999 !important
+
+.el-select:hover .el-input__inner,
+.el-select .el-input__inner
+  border-color: #999 !important
 
 .el-select .el-tag__close.el-icon-close
 	background-color: #474747 !important
+
+.el-select__input,
+.el-input__inner
+  color: #999 !important
 
 .popper__arrow
   border-bottom-color: #333 !important
@@ -119,3 +164,12 @@
 
 .el-select-dropdown__item.hover, .el-select-dropdown__item:hover
   background-color: #3e3e3e !important
+
+.el-carousel__item:nth-child(2n)
+  // background-color: #99a9bf
+  background-color: #000
+
+
+.el-carousel__item:nth-child(2n+1)
+  // background-color: #d3dce6
+  background-color: #000

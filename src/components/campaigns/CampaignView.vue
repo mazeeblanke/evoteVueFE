@@ -1,10 +1,26 @@
 <template>
+  <div class="campaign-view">
    <v-container :fluid="true" :fill-height="false">
     <v-layout align-center justify-center>
       <v-flex xs12>
+        <v-breadcrumbs divider="/">
+          <v-breadcrumbs-item
+            :to="{ name: UCFIRST(route) }"
+            active-class="is-white"
+            ripple
+            v-for="route in $route.path.split('/').filter(r => r)"
+            :key="route"
+            class="capitalize"
+          >
+            {{ route }}
+          </v-breadcrumbs-item>
+        </v-breadcrumbs>
         <v-card raised :height=800>
           <v-card-title class="card-gradient">
-            <h3 class="headline">CAMPAIGN POSITIONS</h3>
+            <div class="is-flex">
+              <v-icon @click="$router.back()">arrow_left</v-icon>
+              <h3 class="headline">CAMPAIGN POSITIONS</h3>
+            </div>
             <v-spacer></v-spacer>
             <v-layout justify-end>
               <v-flex justify-end align-end md5 p5>
@@ -24,8 +40,9 @@
           <v-layout d-flex row wrap>
           <v-flex xs9 sm9 md9>
             <v-data-table
+              :disable-initial-sort=true
               :headers="headers"
-              :items="selectedCampaign.campaign_positions"
+              :items="campaignPositions"
               :search="search"
               :rows-per-page-items="perPageValues"
               :pagination.sync="pagination"
@@ -52,12 +69,14 @@
                   <td>{{ props.item.description }}</td>
                   <td>{{ props.item.created_at }}</td>
                   <td>
-                    <v-icon small class="mr-2" @click.stop.prevent="editItem(props.item)">
-                      edit
-                    </v-icon>
-                    <v-icon small @click="deleteItem(props.item)">
-                      delete
-                    </v-icon>
+                    <template v-if="props.item.id">
+                      <v-icon small class="mr-2" @click.stop.prevent="editItem(props.item)">
+                        edit
+                      </v-icon>
+                      <v-icon small @click="deleteItem(props.item)">
+                        delete
+                      </v-icon>
+                    </template>
                   </td>
                 </tr>
               </template>
@@ -70,30 +89,43 @@
           </v-flex>
           <v-flex xs3 sm3 md3 class="detail">
             <template v-if="campaignPositionUnderReview">
-              <h6 class="headline">Norminees for {{ campaignPositionUnderReview.name }}</h6>
-              <v-icon :style="{'margin-left': '15px'}" @click="normineeDialog = true " color="grey darken-1">add_circle_outline</v-icon>
-              <v-list v-if="campaignPositionUnderReview.norminations.length">
-                <template v-for="(item) in campaignPositionUnderReview.norminations">
-                  <v-list-tile
-                    :key="item.id"
-                    avatar
-                    ripple
-                  >
-                    <v-list-tile-avatar>
-                      <img :src="item.votee.avatar">
-                    </v-list-tile-avatar>
-                    <v-list-tile-content>
-                      <v-list-tile-title>{{ item.votee.username }}</v-list-tile-title>
-                      <v-list-tile-sub-title
-                        v-if="item.votee.firstname && item.votee.lastname"
-                        class="text--primary">
-                          {{ item.votee.firstname + ' ' + item.votee.lastname }}
-                      </v-list-tile-sub-title>
-                      <!-- <v-list-tile-sub-title>{{ item.subtitle }}</v-list-tile-sub-title> -->
-                    </v-list-tile-content>
-                  </v-list-tile>
-                </template>
-              </v-list>
+              <div>
+                <h6 class="headline has-text-centered mt-20">Norminees for {{ campaignPositionUnderReview.name }}</h6>
+                <v-icon :style="{'margin-left': '15px'}" @click="normineeDialog = true " color="grey darken-1">
+                  add_circle_outline
+                </v-icon>
+              </div>
+              <VuePerfectScrollbar
+                v-if="campaignPositionUnderReview.norminations.length"
+                class="scroll-area"
+                :settings="settings"
+              >
+                <v-list>
+                  <template v-for="(item) in campaignPositionUnderReview.norminations">
+                    <v-list-tile
+                      :key="item.id"
+                      avatar
+                      ripple
+                    >
+                      <v-list-tile-avatar>
+                        <img :src="item.votee.avatar">
+                      </v-list-tile-avatar>
+                      <v-list-tile-content>
+                        <v-list-tile-title>{{ item.votee.username }}</v-list-tile-title>
+                        <v-list-tile-sub-title
+                          v-if="item.votee.firstname && item.votee.lastname"
+                          class="text--primary">
+                            {{ item.votee.firstname + ' ' + item.votee.lastname }}
+                        </v-list-tile-sub-title>
+                        <!-- <v-list-tile-sub-title>{{ item.subtitle }}</v-list-tile-sub-title> -->
+                      </v-list-tile-content>
+                      <v-list-tile-action>
+                        <v-icon @click="_deleteNorminee(item)" :style="{ cursor: 'pointer' }">delete</v-icon>
+                      </v-list-tile-action>
+                    </v-list-tile>
+                  </template>
+                </v-list>
+              </VuePerfectScrollbar>
               <EmptyState v-else :style="{ height: '100%'}" empty-text="No norminees yet!"></EmptyState>
             </template>
             <EmptyState v-else :style="{ height: '100%'}" empty-text="No norminees yet!"></EmptyState>
@@ -112,7 +144,8 @@
           ></CampaignFormPosition>
           <CampaignPositionNorminationForm
             :errors="errors"
-            :norminees.sync="norminees"
+            :norminees="norminees"
+            :campaign-id="campaignPositionUnderReview.campaign_id"
             :save="saveNorminees"
             @change="(newValue) => this.norminees = newValue"
             :close="close"
@@ -124,14 +157,17 @@
       </v-flex>
     </v-layout>
   </v-container>
+  </div>
 </template>
 
 
 <script>
 import CampaignFormPosition from '@/components/campaigns/CampaignPositionForm'
+import VuePerfectScrollbar from 'vue-perfect-scrollbar'
 import CampaignPositionNorminationForm from '@/components/campaigns/CampaignPositionNorminationForm'
 import EmptyState from '@/components/shared/EmptyState'
 import _ from 'lodash'
+import { UCFIRST } from '@/utils/helpers'
 
 import {
     mapState,
@@ -142,11 +178,24 @@ export default {
 
   computed: {
     ...mapState ('campaign', ['selectedCampaign']),
+
+    campaignPositions () {
+      let length = this.selectedCampaign.campaign_positions.length
+      let emptyRowsLength = this.pagination.rowsPerPage - length
+      if (emptyRowsLength > 0) {
+        this.selectedCampaign.campaign_positions = [
+          ...this.selectedCampaign.campaign_positions,
+          ...Array(emptyRowsLength).fill({})
+        ]
+      }
+      return this.selectedCampaign.campaign_positions
+    }
   },
 
   components: {
     CampaignPositionNorminationForm,
     CampaignFormPosition,
+    VuePerfectScrollbar,
     EmptyState
   },
 
@@ -154,8 +203,49 @@ export default {
     ...mapActions ('campaign', [
       'loadCampaign',
       'updateCampaignPosition',
-      'addCampaignPositionNorminees'
+      'createCampaignPosition',
+      'addCampaignPositionNorminees',
+      'deleteNorminee'
     ]),
+
+    ...{
+      UCFIRST
+    },
+
+    _deleteNorminee (norminationItem) {
+
+      this.$swal({
+        title: 'Are you sure?',
+        text: "You want to delete this norminee (s)!",
+        type: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes'
+      }).then((result) => {
+        if (result.value) {
+          let campaign_id = this.campaignPositionUnderReview.campaign_id
+          console.log(campaign_id);
+          this.deleteNorminee({
+            'campaign_position_id': norminationItem.campaign_position_id,
+            'votee_id' : norminationItem.votee_id,
+            'campaign_id' : this.campaignPositionUnderReview.campaign_id
+          })
+          .then((res) => {
+            let norminations = this.campaignPositionUnderReview.norminations;
+            let index = norminations.findIndex(n => n.votee_id === norminationItem.votee_id);
+
+            if (index) {
+              this.campaignPositionUnderReview.norminations.splice(
+                index,
+                1
+              )
+            }
+          })
+          .catch(() => {
+
+          })
+        }
+})
+    },
 
     editItem (item) {
       this.editedIndex = this.selectedCampaign.campaign_positions.indexOf(item)
@@ -244,6 +334,7 @@ export default {
         this.snackbar = true
         this.saving = false
         this.errors = []
+        this.norminees = []
         console.log(res)
         this.campaignPositionUnderReview.norminations = [
           ...this.campaignPositionUnderReview.norminations,
@@ -316,10 +407,7 @@ export default {
       dialog: false,
       normineeDialog: false,
       campaignPositionUnderReview: null,
-      perPageValues: [10, 15, 20, {
-        'text': '$vuetify.dataIterator.rowsPerPageAll',
-        'value': -1
-      }],
+      perPageValues: [10],
       search: null,
       total: 0,
       pagination: {},
@@ -327,7 +415,9 @@ export default {
         limit: 10,
         page: 1
       },
-
+      settings: {
+        maxScrollbarLength: 60
+      },
       headers: [
         {
           text: 'ID'
@@ -348,6 +438,17 @@ export default {
 }
 </script>
 
+<style lang="sass">
+.campaign-view
+  .detail
+    .v-list
+      // height: 480px
+      // overflow-y: scroll
+  // .v-breadcrumbs__item
+  //   color: white !important
+</style>
+
+
 
 <style scoped>
 .campaign-position-table {
@@ -356,6 +457,13 @@ export default {
   padding-left: 15px;
   padding-right: 15px;
   height: 90%;
+}
+
+.scroll-area {
+  position: relative;
+  margin: auto;
+  width: 380px;
+  height: 480px;
 }
 
 .detail {
