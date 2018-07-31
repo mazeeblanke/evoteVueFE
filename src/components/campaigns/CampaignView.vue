@@ -171,7 +171,8 @@ import { UCFIRST } from '@/utils/helpers'
 
 import {
     mapState,
-    mapActions
+    mapActions,
+    mapMutations
   } from 'vuex'
 
 export default {
@@ -180,6 +181,7 @@ export default {
     ...mapState ('campaign', ['selectedCampaign']),
 
     campaignPositions () {
+      // if (!this.selectedCampaign) return
       let length = this.selectedCampaign.campaign_positions.length
       let emptyRowsLength = this.pagination.rowsPerPage - length
       if (emptyRowsLength > 0) {
@@ -206,6 +208,10 @@ export default {
       'createCampaignPosition',
       'addCampaignPositionNorminees',
       'deleteNorminee'
+    ]),
+
+    ...mapMutations ('campaign', [
+      'CLEAR_SELECTED_CAMPAIGN'
     ]),
 
     ...{
@@ -366,6 +372,9 @@ export default {
     pagination: {
       handler () {
         this.loading = true
+        if (this.selectedCampaign.id !== parseInt(this.$route.params.id, 10)) {
+          this.CLEAR_SELECTED_CAMPAIGN()
+        }
         const {
           page,
           rowsPerPage,

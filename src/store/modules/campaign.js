@@ -15,6 +15,12 @@ const mutations = {
         state.selectedCampaign = data
     },
 
+    CLEAR_SELECTED_CAMPAIGN (state) {
+      state.selectedCampaign = {
+        campaign_positions: []
+      }
+    },
+
     SET_CAMPAIGNS (state, payload) {
       state.campaigns = payload
     },

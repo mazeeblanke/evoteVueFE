@@ -12,6 +12,7 @@ import {
   Carousel,
   CarouselItem,
   Radio,
+  Loading,
   Option
 } from 'element-ui'
 import VueSweetalert2 from 'vue-sweetalert2';
@@ -40,8 +41,9 @@ Vue.use(Radio)
 Vue.use(Option)
 Vue.use(Carousel)
 Vue.use(CarouselItem)
+Vue.use(Loading)
 Vue.use(VueProgressBar, options)
-Vue.use(VueSweetalert2);
+Vue.use(VueSweetalert2)
 
 Vue.use(VueAxios, axios)
 

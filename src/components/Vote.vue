@@ -15,31 +15,40 @@
           </v-breadcrumbs-item>
         </v-breadcrumbs>
         <v-card raised>
-          <v-data-table
-            v-if='results'
-            :headers="headers"
-            :items="results"
-            hide-actions
-            class="elevation-1"
-          >
-            <template slot="items" slot-scope="props">
-              <td>{{ props.item.normination.campaign_position.name }}</td>
-              <td>
-                <div>
+          <v-card-title class="card-gradient">
+            <div class="is-flex">
+              <v-icon @click="$router.back()">arrow_left</v-icon>
+              <h3 v-if='results && !loading' class="headline">My {{ this.liveCampaign.name }} Campaign Votes</h3>
+            </div>
+          </v-card-title>
+          <div :style="{ height: '500px'}" v-if='results && !loading'>
+            <v-data-table
+              :headers="headers"
+              :items="results"
+              hide-actions
+              class="elevation-1"
+            >
+              <template slot="items" slot-scope="props">
+                <td>{{ props.item.id && props.index + 1 }}</td>
+                <td>{{ props.item.id && props.item.normination.campaign_position.name }}</td>
+                <td>
                   <v-avatar
-                    :size=30
-                    color="grey lighten-4"
-                  >
-                    <img
-                      class="is-rounded-circle"
-                      :src="props.item.normination.votee.avatar">
-                  </v-avatar>
-                </div>
-                {{ props.item.normination.votee.username }}
-              </td>
-            </template>
-          </v-data-table>
-          <v-stepper v-model="e6" vertical v-if="liveCampaign.id && !results">
+                      v-if="props.item.id"
+                      :size=30
+                      color="grey lighten-4"
+                    >
+                      <img
+                        class="is-rounded-circle"
+                        :src="props.item.normination.votee.avatar">
+                    </v-avatar>
+                </td>
+                <td>
+                  {{ props.item.id && props.item.normination.votee.username }}
+                </td>
+              </template>
+            </v-data-table>
+          </div>
+          <v-stepper v-model="e6" vertical v-if="liveCampaign.id && !results && !loading">
             <div v-for="(position, i) in liveCampaign.campaign_positions" :key="i">
               <v-stepper-step @click.native="e6 = i + 1" :complete="e6 > (i + 1)" :step="i + 1">
                 {{ position.name }}
@@ -72,10 +81,18 @@
               </v-stepper-content>
             </div>
           </v-stepper>
-          <div v-if="!results && !liveCampaign.id" :style="{ height: '800px'}" class="is-h-centered">
-            <div>
-              <!-- <v-icon large>not_interested</v-icon> -->
+          <div>
+            <div :style="{ height: '600px'}" class="is-h-centered" v-if="!results && !liveCampaign.id && !loading">
               <h6>No Active campaign</h6>
+            </div>
+            <div :style="{ height: '600px'}" class="is-v-centered" v-if="loading">
+              <v-progress-circular
+                :size="70"
+                :width="1"
+                color="white"
+                indeterminate
+              ></v-progress-circular>
+              <p class="mt-10 is-h-centered" :style="{ color: 'white' }">loading...</p>
             </div>
           </div>
         </v-card>
@@ -107,8 +124,15 @@ import { mapActions, mapState } from 'vuex'
           votes: this.votes
         })
         .then((res) => {
-          console.log(res);
+          // console.log(res);
           this.results = res.votes
+          if (this.results.length < 10) {
+            this.results = [
+              ...this.results,
+              ...Array(10 - this.results.length).fill({})
+            ]
+            // console.log(this.results)
+          }
         })
       },
       vote (normination_id, index) {
@@ -126,11 +150,18 @@ import { mapActions, mapState } from 'vuex'
       return {
         liveCampaign: {},
         e6: 0,
+        loading: false,
         votes:[],
         results: null,
          headers: [
           {
+            text: 'ID'
+          },
+          {
             text: 'Campaign Position'
+          },
+          {
+            text: 'Avatar'
           },
           {
             text: 'Your Vote'
@@ -144,10 +175,11 @@ import { mapActions, mapState } from 'vuex'
     },
 
     mounted () {
+      this.loading = true
       this.liveVote()
       .then(res => {
         console.log(res)
-        if (res.campaign && !res.votes) {
+        if (res.campaign) {
           // this.votes = []
           this.liveCampaign = res.campaign
           if (this.liveCampaign.campaign_positions.length) {
@@ -163,7 +195,18 @@ import { mapActions, mapState } from 'vuex'
         if (res.votes)
         {
           this.results = res.votes
+          if (this.results.length < 10) {
+            this.results = [
+              ...this.results,
+              ...Array(10 - this.results.length).fill({})
+            ]
+            console.log(this.results)
+          }
         }
+        this.loading = false
+      })
+      .catch((err) => {
+        this.loading = false
       })
     }
   }

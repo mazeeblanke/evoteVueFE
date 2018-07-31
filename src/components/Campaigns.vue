@@ -43,7 +43,7 @@
             :pagination.sync="pagination"
             :total-items="campaigns.total"
             :loading="loading"
-            :headers-length=7
+            :headers-length=8
           >
             <template slot="headers" slot-scope="props">
               <tr>
