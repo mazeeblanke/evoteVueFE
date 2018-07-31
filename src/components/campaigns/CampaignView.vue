@@ -235,9 +235,6 @@ export default {
     },
 
     _deleteNorminee (norminationItem) {
-      let norminations = this.campaignPositionUnderReview.norminations
-      let index = norminations.findIndex(n => n.votee_id === norminationItem.votee_id)
-
       this.$swal({
         title: 'Are you sure?',
         text: "You want to delete this norminee (s)!",
@@ -247,22 +244,22 @@ export default {
       }).then((result) => {
         if (result.value) {
           this.$set(
-            this.campaignPositionUnderReview.norminations[index],
+            norminationItem,
             'deleting',
             true
           )
-          this.campaignPositionUnderReview.norminations[index].deleting = true
-          console.log(this.campaignPositionUnderReview.norminations[index])
+          // this.campaignPositionUnderReview.norminations[index].deleting = true
+          // console.log(this.campaignPositionUnderReview.norminations[index])
           let campaign_id = this.campaignPositionUnderReview.campaign_id
-          console.log(campaign_id);
+          // console.log(campaign_id);
           this.deleteNorminee({
             'campaign_position_id': norminationItem.campaign_position_id,
             'votee_id' : norminationItem.votee_id,
             'campaign_id' : this.campaignPositionUnderReview.campaign_id
           })
           .then((res) => {
-            // let norminations = this.campaignPositionUnderReview.norminations;
-            // let index = norminations.findIndex(n => n.votee_id === norminationItem.votee_id);
+            let norminations = this.campaignPositionUnderReview.norminations;
+            let index = norminations.findIndex(n => n.votee_id === norminationItem.votee_id);
 
             if (index) {
               this.campaignPositionUnderReview.norminations.splice(
