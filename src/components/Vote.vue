@@ -136,7 +136,7 @@ import { mapActions, mapState, mapMutations } from 'vuex'
         })
         .then((res) => {
           this.voting = false
-          this.results = res.votes
+          this.results = res.data.votes
           this.hasVoted = true
           if (this.results.length < 10) {
             this.results = [
