@@ -94,7 +94,7 @@
                           <v-list-tile @click.stop.prevent="editItem(props.item)">
                             <v-list-tile-title>Edit</v-list-tile-title>
                           </v-list-tile>
-                          <v-list-tile @click.stop.prevent="_deleteCampaign(props.item)">
+                          <v-list-tile @click.stop.prevent="_deleteCampaignPosition(props.item)">
                             <v-list-tile-title>Delete</v-list-tile-title>
                           </v-list-tile>
                         </v-list>
@@ -321,13 +321,6 @@ export default {
           this.$set(campaignPosition, 'deleting', true)
           this.deleteCampaignPosition({ id: campaignPosition.id })
           .then((res) => {
-            let campaignPositions = this.campaignPositions;
-            let index = campaignPositions.findIndex(c => c.id === campaignPosition.id);
-
-            if (index) {
-              this.campaignPositions.splice(index, 1)
-            }
-
             this.TOGGLE_SNACKBAR({
               msg: res.message,
               color: 'success'
@@ -340,7 +333,7 @@ export default {
             })
           })
         }
-})
+      })
     },
 
     close () {
@@ -373,7 +366,7 @@ export default {
         this.snackbarText = this.editedItem.created_at
           ? "Succesfully updated campaign position!"
           : "Succesfully created campaign position!"
-        // this.snackbar = true
+
         this.TOGGLE_SNACKBAR({
           msg: this.snackbarText,
           color: 'success'
@@ -382,9 +375,7 @@ export default {
         this.errors = []
       })
       .catch((err) => {
-        console.log(err)
         this.saving = false
-        console.log(err.response.data)
         this.errors = err.response.data.message
         this.TOGGLE_SNACKBAR({
           msg: this.errors[0],

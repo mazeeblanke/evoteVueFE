@@ -35,6 +35,12 @@ const mutations = {
       state.campaigns.data.splice(index, 1);
     },
 
+    REMOVE_CAMPAIGN_POSITION (state, id) {
+      let index = state.selectedCampaign.campaign_positions.findIndex(cp => cp.id === id)
+      console.log(index)
+      state.selectedCampaign.campaign_positions.splice(index, 1);
+    },
+
     ADD_CAMPAIGN_POSITION (state, {data}) {
       let campaignPositions = state.selectedCampaign.campaign_positions
 
@@ -117,6 +123,7 @@ const actions = {
 
     deleteCampaignPosition ({ commit }, payload) {
       return Vue.axios.delete(`campaign-positions/${payload.id}`).then((res) => {
+        commit('REMOVE_CAMPAIGN_POSITION', payload.id)
         return res.data
       })
     },
