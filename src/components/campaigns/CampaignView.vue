@@ -70,7 +70,7 @@
                 </tr>
               </template>
               <template slot="items" slot-scope="props">
-                <tr @click="campaignPositionUnderReview = props.item">
+                <tr class="capitalize" @click="campaignPositionUnderReview = props.item">
                   <td>
                     <v-checkbox
                       v-if="props.item.id"

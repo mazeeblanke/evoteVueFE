@@ -68,7 +68,7 @@
             <template slot="items" slot-scope="props">
               <tr
                 class="capitalize"
-                @click.stop.prevent="showCampaign(props.item, $event)"
+                @click.stop="showCampaign(props.item, $event)"
               >
                 <td>
                   <v-checkbox
@@ -80,7 +80,11 @@
                 <td>{{ props.item.id }}</td>
                 <td>{{ props.item.name }}</td>
                 <td>
-                  <div class="has-truncated-text" :style="{ 'width': '230px !important' }">
+                  <div
+                    @click="showCampaign(props.item, $event)"
+                    class="has-truncated-text"
+                    :style="{ 'width': '230px !important' }"
+                  >
                     {{ props.item.description }}
                   </div>
                 </td>
