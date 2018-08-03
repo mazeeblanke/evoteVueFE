@@ -67,7 +67,7 @@
             </template>
             <template slot="items" slot-scope="props">
               <tr
-                class="capitalize"
+                class="capitalize is-clickable"
                 @click.stop="showCampaign(props.item, $event)"
               >
                 <td>

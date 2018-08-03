@@ -9,6 +9,9 @@
   justify-content: center
   align-items: center
 
+.is-clickable
+  cursor: pointer !important
+
 .is-full-height
   height: 100vh
   width: 100vw
@@ -115,8 +118,17 @@ a:focus, a:hover
 .theme--dark .v-table, .application .theme--dark.v-table,
 .theme--dark .v-datatable .v-datatable__actions, .application .theme--dark.v-datatable .v-datatable__actions,
 .theme--dark .detail .v-list
-   background: #383838 !important
+  //  background: #383838 !important
+  // background: rgba(56, 56, 56, 0.45098039215686275) !important
+  background: rgba(25, 25, 25, 0.58) !important
 
+.theme--dark .v-stepper,
+.application .theme--dark.v-stepper
+  background: rgba(25, 25, 25, 0.58) !important
+
+
+.theme--dark .v-dialog .v-card
+  background: #383838 !important
 .v-text-field .v-label
   font-size: 14px !important
 

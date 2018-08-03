@@ -25,7 +25,7 @@
               </div>
             </div>
           </v-card-title>
-          <div :style="{ height: '500px'}" v-if='results && !loading'>
+          <div v-if='results && !loading'>
             <v-data-table
               :headers="headers"
               :items="results"

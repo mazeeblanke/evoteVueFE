@@ -143,7 +143,9 @@ export default {
       return {
         chart: {
           type: 'spline',
-          backgroundColor: this.darkMode ? '#383838' : '#ffffff' ,
+          // backgroundColor: this.darkMode ? '#383838' : '#ffffff' ,
+          // backgroundColor: this.darkMode ? 'rgba(56, 56, 56, 0.25098)' : '#ffffff' ,
+          backgroundColor: this.darkMode ? 'rgba(25, 25, 25, 0.58)' : '#ffffff' ,
         },
         title: {
           text: 'User registration metrics',

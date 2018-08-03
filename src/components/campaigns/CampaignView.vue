@@ -70,7 +70,7 @@
                 </tr>
               </template>
               <template slot="items" slot-scope="props">
-                <tr class="capitalize" @click="campaignPositionUnderReview = props.item">
+                <tr class="capitalize is-clickable" @click="campaignPositionUnderReview = props.item">
                   <td>
                     <v-checkbox
                       v-if="props.item.id"
@@ -158,7 +158,7 @@
                   </template>
                 </v-list>
               </VuePerfectScrollbar>
-              <EmptyState v-else :style="{ height: '100%'}" empty-text="No norminees yet!"></EmptyState>
+              <EmptyState v-else :style="{ height: '80%'}" empty-text="No norminees yet!"></EmptyState>
             </template>
             <EmptyState v-else :style="{ height: '100%'}" empty-text="No norminees yet!"></EmptyState>
           </v-flex>
@@ -325,6 +325,7 @@ export default {
               msg: res.message,
               color: 'success'
             })
+            this.campaignPositionUnderReview = null
           })
           .catch(() => {
            this.TOGGLE_SNACKBAR({
@@ -509,6 +510,7 @@ export default {
 .campaign-view
   .detail
     .v-list
+      background: transparent !important
       // height: 480px
       // overflow-y: scroll
   // .v-breadcrumbs__item

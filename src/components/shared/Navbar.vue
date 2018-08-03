@@ -38,7 +38,7 @@
               <v-icon>more_vert</v-icon>
             </v-btn>
 
-            <v-card>
+            <v-card style="background-color: #424242 !important">
               <v-list>
                 <v-list-tile avatar>
                   <v-list-tile-avatar color="grey lighten-4">

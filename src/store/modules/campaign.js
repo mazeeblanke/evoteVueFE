@@ -31,29 +31,21 @@ const mutations = {
 
     REMOVE_CAMPAIGN (state, id) {
       let index = state.campaigns.data.findIndex(c => c.id === id)
-      console.log(index)
       state.campaigns.data.splice(index, 1);
     },
 
     REMOVE_CAMPAIGN_POSITION (state, id) {
       let index = state.selectedCampaign.campaign_positions.findIndex(cp => cp.id === id)
-      console.log(index)
       state.selectedCampaign.campaign_positions.splice(index, 1);
     },
 
     ADD_CAMPAIGN_POSITION (state, {data}) {
       let campaignPositions = state.selectedCampaign.campaign_positions
 
-      // state.selectedCampaign.campaign_positions.unshift(data[0])
-
       state.selectedCampaign.campaign_positions = [
         ...data,
         ...campaignPositions
       ]
-
-      // if (campaignPositions.length > 10) {
-      //   state.selectedCampaign.campaign_positions = campaignPositions.slice(0, 9);
-      // }
     },
 
     ADD_CAMPAIGN_POSITION_NORMINEES (state, {data}) {
@@ -100,8 +92,18 @@ const actions = {
         })
     },
 
+    disableActiveCampaign () {
+      return Vue.axios.post('campaigns/disableActiveCampaign').then((res) => {
+        return res.data
+      })
+    },
+
     deleteNorminee ({ commit }, payload) {
-      return Vue.axios.delete(`campaign-position-norminations/${payload.campaign_position_id}`, { data: payload })
+      return Vue
+      .axios
+      .delete(`campaign-position-norminations/${payload.campaign_position_id}`, {
+        data: payload
+      })
       .then((res) => {
         return res.data
       })

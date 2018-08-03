@@ -56,6 +56,14 @@
                 <v-icon>{{ subItem.icon }}</v-icon>
               </v-list-tile-action>
             </v-list-tile>
+            <v-list-tile ripple @click.native="_disableActiveCampaign">
+              <v-list-tile-content>
+                <v-list-tile-title class="fw400 is-clickable">Disable Active Campaign</v-list-tile-title>
+              </v-list-tile-content>
+              <v-list-tile-action>
+                <v-icon>highlight</v-icon>
+              </v-list-tile-action>
+            </v-list-tile>
           </v-list-group>
         <v-list-tile class="mt-3">
           <v-list-tile-action>
@@ -74,7 +82,7 @@
 </template>
 
 <script>
-import { mapState } from  'vuex'
+import { mapState, mapActions, mapMutations } from  'vuex'
 export default {
   data: () => {
     return {
@@ -106,6 +114,41 @@ export default {
   },
   computed: {
     ...mapState('app', ['drawer'])
+  },
+  methods: {
+    ...mapActions('campaign', [
+      'disableActiveCampaign'
+    ]),
+
+    ...mapMutations('app', [
+      'TOGGLE_SNACKBAR'
+    ]),
+
+    _disableActiveCampaign () {
+      this.$swal({
+        title: 'Are you sure?',
+        text: "You want to disable active campaign",
+        type: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes'
+      }).then((result) => {
+        if (result.value) {
+          this.disableActiveCampaign()
+          .then((res) => {
+            this.TOGGLE_SNACKBAR({
+              msg: 'Successfully disabled active campaign!',
+              color: 'success'
+            })
+          })
+          .catch(() => {
+           this.TOGGLE_SNACKBAR({
+              msg: 'An error occured !',
+              color: 'error'
+            })
+          })
+        }
+      })
+    }
   }
 }
 </script>
