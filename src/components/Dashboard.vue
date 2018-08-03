@@ -70,7 +70,9 @@ export default {
   .v-content__wrap {
       background: url(http://localhost:8080/img/seperator-hipstertech.png);
       background-repeat: no-repeat;
-      background-blend-mode: soft-light;
+      /* background-blend-mode: soft-light; */
+      background-blend-mode: color;
+      background-color: #282828;
       /* background-color: darkcyan; */
   }
 </style>
