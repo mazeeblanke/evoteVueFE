@@ -4,9 +4,16 @@
     <Navbar></Navbar>
     <v-content>
         <router-view></router-view>
-        <v-snackbar v-model="snackbarActive" :timeout="4000" right>
+        <v-snackbar
+          v-model="snackbarActive"
+          :color="snackbarColor"
+          :timeout="6000"
+          auto-height
+          multi-line
+          right
+        >
           {{ snackbarText }}
-          <v-btn :color="snackbarColor" flat @click="TOGGLE_SNACKBAR">
+          <v-btn flat @click="TOGGLE_SNACKBAR">
             Close
           </v-btn>
         </v-snackbar>

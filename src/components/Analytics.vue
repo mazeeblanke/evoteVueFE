@@ -67,7 +67,7 @@
     <v-layout row wrap>
       <v-flex xs12 md6 p0>
         <v-flex xs12 md12>
-          <v-card height=400>
+          <v-card height=400, width="100%">
             <vue-highcharts :options="options" ref="lineCharts"></vue-highcharts>
           </v-card>
         </v-flex>
@@ -77,37 +77,39 @@
         </v-flex>
       </v-flex>
 
-      <v-flex xs12 md6>
+      <v-flex xs12 md6 class="latestUsers">
         <v-card height=508>
           <v-card-title>
             <h3 class="headline m-10">Latest Users</h3>
           </v-card-title>
           <v-card-text>
-            <v-data-table
-              :headers="headers"
-              :items="users.data.slice(0, 7)"
-              hide-actions
-            >
-              <template slot="items" slot-scope="props">
-                <tr>
-                  <td>
-                    <v-avatar
-                      :tile="false"
-                      :size=35
-                      color="grey lighten-4"
-                    >
-                      <img
-                        class="is-rounded-circle"
-                        :style="{ 'text-indent' : props.item.avatar === '/' ? '-9999px' : '0px' }"
-                        :src="props.item.avatar">
-                    </v-avatar>
-                  </td>
-                  <td>{{ props.item.username }}</td>
-                  <td>{{ props.item.confirmed }}</td>
-                  <td>{{ props.item.created_at }}</td>
-                </tr>
-              </template>
-            </v-data-table>
+            <VuePerfectScrollbar class="wrapper">
+              <v-data-table
+                :headers="headers"
+                :items="users.data.slice(0, 7)"
+                hide-actions
+              >
+                <template slot="items" slot-scope="props">
+                  <tr>
+                    <td>
+                      <v-avatar
+                        :tile="false"
+                        :size=35
+                        color="grey lighten-4"
+                      >
+                        <img
+                          class="is-rounded-circle"
+                          :style="{ 'text-indent' : props.item.avatar === '/' ? '-9999px' : '0px' }"
+                          :src="props.item.avatar">
+                      </v-avatar>
+                    </td>
+                    <td>{{ props.item.username }}</td>
+                    <td>{{ props.item.confirmed }}</td>
+                    <td>{{ props.item.created_at }}</td>
+                  </tr>
+                </template>
+              </v-data-table>
+            </VuePerfectScrollbar>
           </v-card-text>
         </v-card>
       </v-flex>
@@ -121,6 +123,7 @@ import {
   mapActions
 } from 'vuex'
 import VueHighcharts from 'vue2-highcharts'
+import VuePerfectScrollbar from 'vue-perfect-scrollbar'
 
 const asyncData = {
   name: 'Months',
@@ -140,18 +143,18 @@ export default {
       return {
         chart: {
           type: 'spline',
-          backgroundColor: this.darkMode ? '#424242' : '#ffffff' ,
+          backgroundColor: this.darkMode ? '#383838' : '#ffffff' ,
         },
         title: {
           text: 'User registration metrics',
           style: {
-            color: this.darkMode ? '#f0f8ff5c' : '#424242',
+            color: this.darkMode ? '#f0f8ff5c' : '#383838',
           }
         },
         subtitle: {
           text: 'Source: Database',
           style: {
-            color: this.darkMode ? '#f0f8ff5c' : '#424242'
+            color: this.darkMode ? '#f0f8ff5c' : '#383838'
           }
         },
         xAxis: {
@@ -184,7 +187,8 @@ export default {
   },
 
   components: {
-    VueHighcharts
+    VueHighcharts,
+    VuePerfectScrollbar
   },
 
   mounted () {
@@ -243,9 +247,14 @@ export default {
    background-color: #f3f3f3
  }
 
+ .analytics .latestUsers .wrapper {
+    /* overflow-y: scroll !important; */
+    height: 415px !important
+  }
+
  .analytics .card4 {
-   /* background-color: #E91E63 */
-   background: radial-gradient(#b7004c, #E91E63)
+   /* background-color: #E91E63  !important */
+   background: radial-gradient(#b7004c, #E91E63) !important
  }
 
  .analytics .card3 {

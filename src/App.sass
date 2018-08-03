@@ -89,6 +89,17 @@
   display: flex
   justify-content: center
 
+.has-truncated-text
+  overflow: hidden !important
+  white-space: nowrap !important
+  text-overflow: ellipsis !important
+
+
+// override
+
+a:focus, a:hover
+  color: #ffffff !important
+
 
   // Override vuetify
 
@@ -108,6 +119,9 @@
 
 .v-text-field .v-label
   font-size: 14px !important
+
+table.v-table tbody td
+  height: 60px !important
 
 .v-stepper__step
   cursor: pointer !important
@@ -182,10 +196,15 @@
 .swal2-modal
   background-color: #383838 !important
 
-.swal2-icon.swal2-warning
-  border-color: #ffffff !important
-  color: #ffffff !important
+// .swal2-icon.swal2-warning
+//   border-color: #ffffff !important
+//   color: #ffffff !important
 
 .swal2-popup .swal2-title,
 .swal2-popup .swal2-content
 	color: #959595 !important
+
+.swal2-popup .swal2-styled:focus
+    outline: 0 !important
+    // -webkit-box-shadow: 0 0 0 2px #464646, 0 0 0 4px rgba(50,100,150,.4)
+    box-shadow: 0 0 0 2px #464646, 0 0 0 4px rgba(50,100,150,.4) !important

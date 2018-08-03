@@ -18,7 +18,11 @@
           <v-card-title class="card-gradient">
             <div class="is-flex">
               <v-icon @click="$router.back()">arrow_left</v-icon>
-              <h3 v-if='results && !loading' class="headline">My {{ this.liveCampaign.name }} Campaign Votes</h3>
+              <h3 v-if='hasVoted && !loading' class="headline">My {{ liveCampaign.name }} Campaign Votes</h3>
+              <div v-if='!hasVoted && !loading'>
+                <h3 class="headline">{{ liveCampaign.name }} Campaign</h3>
+                <!-- <p>{{ liveCampaign.description }}</p> -->
+              </div>
             </div>
           </v-card-title>
           <div :style="{ height: '500px'}" v-if='results && !loading'>
@@ -29,8 +33,8 @@
               class="elevation-1"
             >
               <template slot="items" slot-scope="props">
-                <td>{{ props.item.id && props.index + 1 }}</td>
-                <td>{{ props.item.id && props.item.normination.campaign_position.name }}</td>
+                <td class="capitalize">{{ props.item.id && props.index + 1 }}</td>
+                <td class="capitalize">{{ props.item.id && props.item.normination.campaign_position.name }}</td>
                 <td>
                   <v-avatar
                       v-if="props.item.id"
@@ -42,7 +46,7 @@
                         :src="props.item.normination.votee.avatar">
                     </v-avatar>
                 </td>
-                <td>
+                <td class="capitalize">
                   {{ props.item.id && props.item.normination.votee.username }}
                 </td>
               </template>
@@ -60,7 +64,6 @@
                       v-for="normination in position.norminations"
                       :key="normination.id">
                       <div class="is-v-centered p10">
-                        <!-- <h3>{{ normination.votee.username }}</h3> -->
                         <el-radio v-model="votes[i].normination_id" :label="normination.id">
                           {{ normination.votee.username }}
                         </el-radio>
@@ -76,7 +79,7 @@
                     </el-carousel-item>
                   </el-carousel>
                 <v-btn v-if="i !== liveCampaign.campaign_positions.length - 1" color="primary" @click="e6 = i + 2">Continue</v-btn>
-                <v-btn v-else @click="submit" color="primary">Submit Vote</v-btn>
+                <v-btn v-else :loading="voting" @click="submit" color="primary">Submit Vote</v-btn>
                 <v-btn @click="e6 = e6 - 1" flat>Back</v-btn>
               </v-stepper-content>
             </div>
@@ -92,7 +95,7 @@
                 color="white"
                 indeterminate
               ></v-progress-circular>
-              <p class="mt-10 is-h-centered" :style="{ color: 'white' }">loading...</p>
+              <p class="mt-20 is-h-centered" :style="{ color: 'white' }">Loading....</p>
             </div>
           </div>
         </v-card>
@@ -103,36 +106,58 @@
 
 <script>
 import { UCFIRST } from "@/utils/helpers"
-import { mapActions, mapState } from 'vuex'
+import { mapActions, mapState, mapMutations } from 'vuex'
 
   export default {
     methods: {
+
       ...{
         UCFIRST
       },
+
       ...mapActions('campaign', [
         'loadCampaign'
       ]),
+
       ...mapActions('vote', [
         'setVotes',
         'liveVote'
       ]),
+
+      ...mapMutations('app', [
+        'TOGGLE_SNACKBAR'
+      ]),
+
       submit () {
+        this.voting = true
         this.setVotes({
-          // voter_id: this.user.id,
           campaign_id: this.liveCampaign.id,
           votes: this.votes
         })
         .then((res) => {
-          // console.log(res);
+          this.voting = false
           this.results = res.votes
+          this.hasVoted = true
           if (this.results.length < 10) {
             this.results = [
               ...this.results,
               ...Array(10 - this.results.length).fill({})
             ]
-            // console.log(this.results)
           }
+
+          this.TOGGLE_SNACKBAR({
+            msg: 'Successfully voted !!',
+            color: 'success'
+          })
+
+        })
+        .catch((err) => {
+          console.log(err)
+          this.voting = false
+          this.TOGGLE_SNACKBAR({
+            msg: 'An error occured!',
+            color: 'error'
+          })
         })
       },
       vote (normination_id, index) {
@@ -151,9 +176,11 @@ import { mapActions, mapState } from 'vuex'
         liveCampaign: {},
         e6: 0,
         loading: false,
+        voting: false,
         votes:[],
         results: null,
-         headers: [
+        hasVoted: false,
+        headers: [
           {
             text: 'ID'
           },
@@ -195,6 +222,7 @@ import { mapActions, mapState } from 'vuex'
         if (res.votes)
         {
           this.results = res.votes
+          this.hasVoted = true
           if (this.results.length < 10) {
             this.results = [
               ...this.results,

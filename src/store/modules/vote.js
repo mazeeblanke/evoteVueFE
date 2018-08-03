@@ -13,9 +13,7 @@ const mutations = {
 const actions = {
   setVotes ({ commit }, payload) {
     return Vue.axios.post('votes', payload).then((res) => {
-      // commit('SET_CAMPAIGNS', res.data)
-      console.log(res)
-      return res.data.data
+      return res.data
     })
   },
 

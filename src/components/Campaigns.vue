@@ -67,7 +67,8 @@
             </template>
             <template slot="items" slot-scope="props">
               <tr
-                @click.stop.prevent="showCampaign(props.item.id)"
+                class="capitalize"
+                @click.stop.prevent="showCampaign(props.item, $event)"
               >
                 <td>
                   <v-checkbox
@@ -78,20 +79,36 @@
                 </td>
                 <td>{{ props.item.id }}</td>
                 <td>{{ props.item.name }}</td>
-                <td>{{ props.item.description }}</td>
+                <td>
+                  <div class="has-truncated-text" :style="{ 'width': '230px !important' }">
+                    {{ props.item.description }}
+                  </div>
+                </td>
                 <td>{{ props.item.active }}</td>
                 <td>{{ props.item.start_date }}</td>
                 <td>{{ props.item.end_date }}</td>
                 <td>{{ props.item.created_at }}</td>
                 <td>
-                  <template v-if="props.item.id">
-                    <v-icon small class="mr-2" @click.stop.prevent="editItem(props.item)">
-                      edit
-                    </v-icon>
-                    <v-icon small @click="deleteItem(props.item)">
-                      delete
-                    </v-icon>
+                  <template v-if="props.item.id && (!props.item.deleting && !props.item.activating)">
+                    <v-menu transition="slide-y-transition" offset-y offset-x>
+                      <v-icon slot="activator">more_horiz</v-icon>
+                      <v-list>
+                        <v-list-tile @click="editItem(props.item)">
+                          <v-list-tile-title>Edit</v-list-tile-title>
+                        </v-list-tile>
+                        <v-list-tile @click="activateCampaign(props.item)">
+                          <v-list-tile-title>Set As Active Campaign</v-list-tile-title>
+                        </v-list-tile>
+                        <v-list-tile @click="_deleteCampaign(props.item)">
+                          <v-list-tile-title>Delete</v-list-tile-title>
+                        </v-list-tile>
+                      </v-list>
+                    </v-menu>
                   </template>
+                  <v-progress-linear
+                    v-else-if="props.item.id && (props.item.deleting || props.item.activating)"
+                    :indeterminate="true"
+                  ></v-progress-linear>
                 </td>
               </tr>
             </template>
@@ -114,26 +131,13 @@
         </v-card>
       </v-flex>
     </v-layout>
-    <v-snackbar
-      v-model="snackbar"
-      :timeout="4000"
-      right
-    >
-      {{ snackbarText }}
-      <v-btn
-        dark
-        flat
-        @click="snackbar = false"
-      >
-        Close
-      </v-btn>
-    </v-snackbar>
   </v-container>
 </template>
 
 <script>
   import {
     mapState,
+    mapMutations,
     mapActions
   } from 'vuex'
 
@@ -148,17 +152,13 @@
 
       formattedCampaigns () {
         let length = this.campaigns.data.length
-        let pageSize = this.pagination.rowsPerPage
+        let pageSize = this.pagination.rowsPerPage || 0
         let emptyRowsLength = Math.abs(pageSize - length)
-        if (emptyRowsLength > 0) {
-          return [
-            ...this.campaigns.data,
-            ...Array(emptyRowsLength).fill({})
-          ].slice(0, pageSize)
-        }
-        return this.campaigns.data
+        return [
+          ...this.campaigns.data,
+          ...Array(emptyRowsLength).fill({})
+        ].slice(0, pageSize)
       }
-
     },
 
     components: {
@@ -169,26 +169,58 @@
       ...mapActions ('campaign', [
         'loadCampaigns',
         'updateCampaign',
-        'createCampaign'
+        'createCampaign',
+        'deleteCampaign',
+        'setActiveCampaign'
+      ]),
+
+      ...mapMutations('app', [
+        'TOGGLE_SNACKBAR'
       ]),
 
       ...{
         UCFIRST
       },
 
-      showCampaign (id) {
-        this.$router.push(`/dashboard/campaigns/${parseInt(id, 10)}`)
-        // this.$router.push('dashboard/campaigns')
-        // this.$router.push({
-        //   params: { id: parseInt(id, 10) },
-        //   path: `dashboard/campaigns/${parseInt(id, 10)}`
-        // })
+      showCampaign (campaign, event) {
+        if (campaign.deleting || event.target.localName !== 'td') return
+        this.$router.push(`/dashboard/campaigns/${parseInt(campaign.id, 10)}`)
       },
 
-      editItem (item) {
-        this.editedIndex = this.campaigns.data.indexOf(item)
-        this.editedItem = Object.assign({}, item)
+      editItem (campaign) {
+        this.editedIndex = this.campaigns.data.indexOf(campaign)
+        this.editedItem = Object.assign({}, campaign)
         this.dialog = true
+      },
+
+      activateCampaign (campaign) {
+        this.$swal({
+          // title: 'Are you sure you want to Activate this campaign?',
+          title: 'Are you sure ?',
+          text: "This would disable any other activate campaign!",
+          type: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Yes'
+        }).then((result) => {
+          if (result.value) {
+            this.$set(campaign, 'activating', true)
+            console.log(campaign)
+            this.setActiveCampaign({ campaignId: campaign.id})
+            .then((res) => {
+              this.TOGGLE_SNACKBAR({
+                msg: res.message,
+                color: 'success'
+              })
+            })
+            .catch((err) => {
+              this.$set(campaign, 'activating', false)
+              this.TOGGLE_SNACKBAR({
+                msg: err.response.data.message,
+                color: 'error'
+              })
+            })
+          }
+        })
       },
 
       showCampaignForm () {
@@ -204,9 +236,31 @@
         }, 500)()
       },
 
-      deleteItem (item) {
-        // const index = this.campaigns.data.indexOf(item)
-        // confirm('Are you sure you want to delete this item?') && this.campaigns.data.splice(index, 1)
+      _deleteCampaign (campaign) {
+        this.$swal({
+          title: 'Are you sure?',
+          text: "You want to delete this campaign (s)!",
+          type: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Yes'
+        }).then((result) => {
+          if (result.value) {
+            this.$set(campaign, 'deleting', true)
+            this.deleteCampaign({ id: campaign.id})
+            .then((res) => {
+              this.TOGGLE_SNACKBAR({
+                msg: res.message,
+                color: 'success'
+              })
+            })
+            .catch(() => {
+              this.TOGGLE_SNACKBAR({
+                msg: 'An error occured!',
+                color: 'error'
+              })
+            })
+          }
+        })
       },
 
       close () {
@@ -228,7 +282,11 @@
           this.snackbarText = this.editedItem.created_at
             ? "Succesfully updated campaign!"
             : "Succesfully created campaign!"
-          this.snackbar = true
+          this.TOGGLE_SNACKBAR({
+            msg: this.snackbarText,
+            color: 'success'
+          })
+          // this.snackbar = true
           this.saving = false
           this.errors = []
           this.campaigns.total += 1
@@ -237,6 +295,10 @@
           this.saving = false
           console.log(err.response.data)
           this.errors = err.response.data.message
+          this.TOGGLE_SNACKBAR({
+            msg: this.errors[0],
+            color: 'success'
+          })
         })
       }
 
@@ -267,7 +329,8 @@
               this.loading = false
             })
         },
-        deep: true
+        deep: true,
+        immediate: true
       }
     },
 

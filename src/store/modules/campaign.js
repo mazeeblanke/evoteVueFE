@@ -29,11 +29,25 @@ const mutations = {
       state.campaigns.data.unshift(data)
     },
 
+    REMOVE_CAMPAIGN (state, id) {
+      let index = state.campaigns.data.findIndex(c => c.id === id)
+      console.log(index)
+      state.campaigns.data.splice(index, 1);
+    },
+
     ADD_CAMPAIGN_POSITION (state, {data}) {
+      let campaignPositions = state.selectedCampaign.campaign_positions
+
+      // state.selectedCampaign.campaign_positions.unshift(data[0])
+
       state.selectedCampaign.campaign_positions = [
         ...data,
-        ...state.selectedCampaign.campaign_positions
+        ...campaignPositions
       ]
+
+      // if (campaignPositions.length > 10) {
+      //   state.selectedCampaign.campaign_positions = campaignPositions.slice(0, 9);
+      // }
     },
 
     ADD_CAMPAIGN_POSITION_NORMINEES (state, {data}) {
@@ -41,21 +55,34 @@ const mutations = {
     },
 
     UPDATE_SELECTED_CAMPAIGN (state, {data}) {
-      let foundCampaignIndex = state
+      let foundIndex = state
       .campaigns
-      .data.findIndex((campaign) => campaign.id === data.id)
-      if (foundCampaignIndex > -1) {
-        state.campaigns.data[foundCampaignIndex] = data
+      .data
+      .map(campaign => ({
+        ...campaign,
+        active: false
+      }))
+      .findIndex((campaign) => campaign.id === data.id)
+      if (foundIndex > -1) {
+        Vue.set(
+          state.campaigns.data,
+          foundIndex,
+          data
+        )
       }
     },
 
     UPDATE_SELECTED_CAMPAIGN_POSITION (state, {data}) {
-      let foundCampaignIndex = state
+      let foundIndex = state
       .selectedCampaign
       .campaign_positions
       .findIndex((campaign) => campaign.id === data.id)
-      if (foundCampaignIndex > -1) {
-        state.selectedCampaign.campaign_positions[foundCampaignIndex] = data
+      if (foundIndex > -1) {
+        Vue.set(
+          state.selectedCampaign.campaign_positions,
+          foundIndex,
+          data
+        )
       }
     }
 }
@@ -81,6 +108,19 @@ const actions = {
       })
     },
 
+    deleteCampaign ({ commit }, payload) {
+      return Vue.axios.delete(`campaigns/${payload.id}`).then((res) => {
+        commit('REMOVE_CAMPAIGN', payload.id)
+        return res.data
+      })
+    },
+
+    deleteCampaignPosition ({ commit }, payload) {
+      return Vue.axios.delete(`campaign-positions/${payload.id}`).then((res) => {
+        return res.data
+      })
+    },
+
     updateCampaign ({ commit }, payload) {
       return Vue.axios.patch(`campaigns/${payload.id}`, payload).then((res) => {
         commit('SET_SELECTED_CAMPAIGN', res.data)
@@ -92,6 +132,13 @@ const actions = {
     createCampaign ({ commit }, payload) {
       return Vue.axios.post('campaigns', payload).then((res) => {
         commit('ADD_CAMPAIGN', res.data)
+        return res.data
+      })
+    },
+
+    setActiveCampaign ({ commit }, payload) {
+      return Vue.axios.post('campaigns/setActiveCampaign', payload).then((res) => {
+        commit('UPDATE_SELECTED_CAMPAIGN', res.data)
         return res.data
       })
     },

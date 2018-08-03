@@ -40,7 +40,6 @@
           <v-layout d-flex row wrap>
           <v-flex xs9 sm9 md9>
             <v-data-table
-              :disable-initial-sort=true
               :headers="headers"
               :items="campaignPositions"
               :search="search"
@@ -81,17 +80,30 @@
                   </td>
                   <td>{{ props.item.id }}</td>
                   <td>{{ props.item.name }}</td>
-                  <td>{{ props.item.description }}</td>
+                  <td>
+                    <div class="has-truncated-text" :style="{ 'width': '230px !important' }">
+                      {{ props.item.description }}
+                    </div>
+                  </td>
                   <td>{{ props.item.created_at }}</td>
                   <td>
-                    <template v-if="props.item.id">
-                      <v-icon small class="mr-2" @click.stop.prevent="editItem(props.item)">
-                        edit
-                      </v-icon>
-                      <v-icon small @click="deleteItem(props.item)">
-                        delete
-                      </v-icon>
+                    <template v-if="props.item.id && !props.item.deleting">
+                      <v-menu transition="slide-x-transition" offset-y offset-x>
+                        <v-icon slot="activator">more_horiz</v-icon>
+                        <v-list>
+                          <v-list-tile @click.stop.prevent="editItem(props.item)">
+                            <v-list-tile-title>Edit</v-list-tile-title>
+                          </v-list-tile>
+                          <v-list-tile @click.stop.prevent="_deleteCampaign(props.item)">
+                            <v-list-tile-title>Delete</v-list-tile-title>
+                          </v-list-tile>
+                        </v-list>
+                      </v-menu>
                     </template>
+                    <v-progress-linear
+                      v-if="props.item.deleting"
+                      :indeterminate="true"
+                    ></v-progress-linear>
                   </td>
                 </tr>
               </template>
@@ -135,7 +147,11 @@
                         <!-- <v-list-tile-sub-title>{{ item.subtitle }}</v-list-tile-sub-title> -->
                       </v-list-tile-content>
                       <v-list-tile-action>
-                        <v-icon v-if="!item.deleting" @click="_deleteNorminee(item)" :style="{ cursor: 'pointer' }">delete</v-icon>
+                        <v-icon
+                          v-if="!item.deleting"
+                          @click="_deleteNorminee(item)"
+                          :style="{ cursor: 'pointer' }"
+                        >delete</v-icon>
                         <v-progress-linear v-else :indeterminate="true"></v-progress-linear>
                       </v-list-tile-action>
                     </v-list-tile>
@@ -197,16 +213,15 @@ export default {
     ...mapState ('campaign', ['selectedCampaign']),
 
     campaignPositions () {
-      // if (!this.selectedCampaign) return
       let length = this.selectedCampaign.campaign_positions.length
-      let emptyRowsLength = this.pagination.rowsPerPage - length
-      if (emptyRowsLength > 0) {
-        this.selectedCampaign.campaign_positions = [
-          ...this.selectedCampaign.campaign_positions,
-          ...Array(emptyRowsLength).fill({})
-        ]
-      }
-      return this.selectedCampaign.campaign_positions
+      let pageSize = this.pagination.rowsPerPage || 0
+      let page = this.pagination.page
+      let emptyRowsLength = Math.abs(pageSize - length)
+
+      return [
+        ...this.selectedCampaign.campaign_positions,
+        ...Array(emptyRowsLength).fill({})
+      ].slice(((pageSize * page) - pageSize) , pageSize * page)
     }
   },
 
@@ -223,11 +238,16 @@ export default {
       'updateCampaignPosition',
       'createCampaignPosition',
       'addCampaignPositionNorminees',
-      'deleteNorminee'
+      'deleteNorminee',
+      'deleteCampaignPosition'
     ]),
 
     ...mapMutations ('campaign', [
       'CLEAR_SELECTED_CAMPAIGN'
+    ]),
+
+    ...mapMutations('app', [
+      'TOGGLE_SNACKBAR'
     ]),
 
     ...{
@@ -248,10 +268,7 @@ export default {
             'deleting',
             true
           )
-          // this.campaignPositionUnderReview.norminations[index].deleting = true
-          // console.log(this.campaignPositionUnderReview.norminations[index])
           let campaign_id = this.campaignPositionUnderReview.campaign_id
-          // console.log(campaign_id);
           this.deleteNorminee({
             'campaign_position_id': norminationItem.campaign_position_id,
             'votee_id' : norminationItem.votee_id,
@@ -272,7 +289,7 @@ export default {
 
           })
         }
-})
+      })
     },
 
     editItem (item) {
@@ -292,10 +309,39 @@ export default {
       }, 500)()
     },
 
-    // deleteItem (item) {
-    //   const index = this.campaign.campaign_positions.indexOf(item)
-    //   confirm('Are you sure you want to delete this item?') && this.campaigns.data.splice(index, 1)
-    // },
+    _deleteCampaignPosition (campaignPosition) {
+      this.$swal({
+        title: 'Are you sure?',
+        text: "You want to delete this campaign position (s)!",
+        type: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes'
+      }).then((result) => {
+        if (result.value) {
+          this.$set(campaignPosition, 'deleting', true)
+          this.deleteCampaignPosition({ id: campaignPosition.id })
+          .then((res) => {
+            let campaignPositions = this.campaignPositions;
+            let index = campaignPositions.findIndex(c => c.id === campaignPosition.id);
+
+            if (index) {
+              this.campaignPositions.splice(index, 1)
+            }
+
+            this.TOGGLE_SNACKBAR({
+              msg: res.message,
+              color: 'success'
+            })
+          })
+          .catch(() => {
+           this.TOGGLE_SNACKBAR({
+              msg: 'An error occured !',
+              color: 'error'
+            })
+          })
+        }
+})
+    },
 
     close () {
       this.dialog = false
@@ -327,7 +373,11 @@ export default {
         this.snackbarText = this.editedItem.created_at
           ? "Succesfully updated campaign position!"
           : "Succesfully created campaign position!"
-        this.snackbar = true
+        // this.snackbar = true
+        this.TOGGLE_SNACKBAR({
+          msg: this.snackbarText,
+          color: 'success'
+        })
         this.saving = false
         this.errors = []
       })
@@ -336,6 +386,10 @@ export default {
         this.saving = false
         console.log(err.response.data)
         this.errors = err.response.data.message
+        this.TOGGLE_SNACKBAR({
+          msg: this.errors[0],
+          color: 'error'
+        })
       })
     },
 
@@ -349,17 +403,10 @@ export default {
         }))
       }
 
-      // const doAction = this.editedItem.created_at
-      //   ? this.updateCampaignPosition
-      //   : this.createCampaignPosition
-
       this.addCampaignPositionNorminees(payload)
       .then((res) => {
         this.close()
-        this.snackbarText = this.editedItem.created_at
-          ? "Succesfully added norminees!"
-          : "Succesfully !"
-        this.snackbar = true
+        // this.snackbar = true
         this.saving = false
         this.errors = []
         this.norminees = []
@@ -368,27 +415,25 @@ export default {
           ...this.campaignPositionUnderReview.norminations,
           ...res
         ]
+
+        this.TOGGLE_SNACKBAR({
+          msg: "Succesfully added norminees!",
+          color: 'success'
+        })
+
       })
       .catch((err) => {
         console.log(err)
         this.saving = false
         console.log(err.response.data)
         this.errors = err.response.data.message
+        this.TOGGLE_SNACKBAR({
+          msg: "An error occured!",
+          color: 'error'
+        })
       })
     }
   },
-
-  // mounted () {
-  //   if (this.selectedCampaign.campaign_positions.length) return
-  //   this.loading = true
-  //   this.loadCampaignPositions(this.filter)
-  //     .then(() => {
-  //       this.loading = false
-  //     })
-  //     .catch(() => {
-  //       this.loading = false
-  //     })
-  // },
 
   watch: {
     pagination: {
