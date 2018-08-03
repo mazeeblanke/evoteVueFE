@@ -18,9 +18,9 @@
           <v-card-title class="card-gradient">
             <div class="is-flex">
               <v-icon @click="$router.back()">arrow_left</v-icon>
-              <h3 v-if='hasVoted && !loading' class="headline">My {{ liveCampaign.name }} Campaign Votes</h3>
+              <h6 v-if='hasVoted && !loading' class="headline">My {{ liveCampaign.name }} Campaign Votes</h6>
               <div v-if='!hasVoted && !loading'>
-                <h3 class="headline">{{ liveCampaign.name }} Campaign</h3>
+                <h6 class="headline">{{ liveCampaign.name }} Campaign</h6>
                 <!-- <p>{{ liveCampaign.description }}</p> -->
               </div>
             </div>

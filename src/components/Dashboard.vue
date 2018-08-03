@@ -1,5 +1,5 @@
 <template>
-  <v-app :dark="darkMode? true : false" id="inspire">
+  <v-app class="dashboard" :dark="darkMode? true : false" id="inspire">
     <Sidebar></Sidebar>
     <Navbar></Navbar>
     <v-content>
@@ -65,3 +65,13 @@ export default {
     }
 }
 </script>
+
+<style>
+  .v-content__wrap {
+      background: url(http://localhost:8080/img/seperator-hipstertech.png);
+      background-repeat: no-repeat;
+      background-blend-mode: soft-light;
+      /* background-color: darkcyan; */
+  }
+</style>
+
