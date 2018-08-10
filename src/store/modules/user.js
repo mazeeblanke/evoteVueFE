@@ -8,6 +8,14 @@ const init_state = () => {
     }
 }
 
+const getters = () => {
+  return {
+    userHasAdminRole(state) {
+      return state.user.roles && state.user.roles.filter(u => u.name === 'admin').length > 0
+    }
+  }
+}
+
 const mutations = {
     SET_USER (state, payload) {
         state.user = payload
@@ -20,7 +28,7 @@ const mutations = {
     UPDATE_USER (state, {data}) {
       let foundUserIndex = state.users.data.findIndex((user) => user.id === data.id)
       if (foundUserIndex > -1) {
-        state.users.data[foundUserIndex] = data
+        Vue.set(state.users.data, foundUserIndex, data)
       }
     }
 }
@@ -36,6 +44,7 @@ const actions = {
     updateUser ({ commit }, payload) {
       return Vue.axios.patch(`users/${payload.id}`, payload).then((res) => {
         commit('SET_USER', res.data.data)
+        commit('UPDATE_USER', res.data)
         return res.data
       })
     },
@@ -62,5 +71,6 @@ export default {
     namespaced: true,
     state: init_state(),
     mutations,
-    actions
+    actions,
+    getters: getters()
 }

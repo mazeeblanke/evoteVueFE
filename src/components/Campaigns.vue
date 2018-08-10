@@ -1,5 +1,5 @@
 <template>
-  <v-container :fluid="true" :fill-height="false">
+  <v-container v-if="userHasAdminRole" :fluid="true" :fill-height="false">
     <v-layout align-center justify-center>
       <v-flex xs12>
         <v-breadcrumbs divider="/">
@@ -142,7 +142,8 @@
   import {
     mapState,
     mapMutations,
-    mapActions
+    mapActions,
+    mapGetters
   } from 'vuex'
 
   import _ from 'lodash'
@@ -153,6 +154,10 @@
 
     computed: {
       ...mapState ('campaign', ['campaigns']),
+
+      ...mapGetters('user', [
+        'userHasAdminRole'
+      ]),
 
       formattedCampaigns () {
         let length = this.campaigns.data.length
@@ -187,7 +192,7 @@
       },
 
       showCampaign (campaign, event) {
-        if (campaign.deleting || event.target.localName !== 'td') return
+        if (campaign.deleting || event.target.localName !== 'td' || !campaign.id) return
         this.$router.push(`/dashboard/campaigns/${parseInt(campaign.id, 10)}`)
       },
 
@@ -219,7 +224,7 @@
             .catch((err) => {
               this.$set(campaign, 'activating', false)
               this.TOGGLE_SNACKBAR({
-                msg: err.response.data.message,
+                msg: `${err.response.data.message}`,
                 color: 'error'
               })
             })
@@ -329,8 +334,16 @@
             .then(() => {
               this.loading = false
             })
-            .catch(() => {
+            .catch((err) => {
               this.loading = false
+              if (err.response.status === 401) {
+                this.TOGGLE_SNACKBAR({
+                  msg: `${err.response.data.message}`,
+                  color: 'error',
+                  position: 'top',
+                  multiLine: false
+                })
+              }
             })
         },
         deep: true,

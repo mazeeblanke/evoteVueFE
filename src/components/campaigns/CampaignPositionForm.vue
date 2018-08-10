@@ -15,7 +15,7 @@
               label="Name"
               box
               clearable
-              :error-messages="errors.name"
+              :error-messages="errors['positions.0.name']"
             ></v-text-field>
           </v-flex>
           <v-flex xs12 sm6 md8>
@@ -24,7 +24,7 @@
               label="Description"
               box
               clearable
-              :error-messages="errors.name"
+              :error-messages="errors['positions.0.description']"
             ></v-text-field>
           </v-flex>
         </v-layout>

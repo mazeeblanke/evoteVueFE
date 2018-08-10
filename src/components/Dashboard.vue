@@ -7,10 +7,11 @@
         <v-snackbar
           v-model="snackbarActive"
           :color="snackbarColor"
-          :timeout="6000"
+          :timeout="timeout"
           auto-height
-          multi-line
-          right
+          :multi-line="multiLine"
+          :right="position === 'right'"
+          :top="position === 'top'"
         >
           {{ snackbarText }}
           <v-btn flat @click="TOGGLE_SNACKBAR">
@@ -51,7 +52,10 @@ export default {
         'darkMode',
         'snackbarColor',
         'snackbarText',
-        'snackbar'
+        'snackbar',
+        'timeout',
+        'position',
+        'multiLine'
       ]),
 
       snackbarActive: {

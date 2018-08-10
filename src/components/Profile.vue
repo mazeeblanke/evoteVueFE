@@ -175,8 +175,13 @@
 
       submit () {
         this.saving = true
-        this.updateUser(_.pickBy(this.user, (u) => u))
-        // this.updateUser(this.user)
+        this.updateUser(
+          _.pickBy({
+            ...this.user,
+            confirmed: null,
+            roles: null
+          }, (value) => value)
+        )
         .then(() => {
           this.saving = false
           this.TOGGLE_SNACKBAR({
@@ -184,8 +189,16 @@
             color: 'success'
           });
         })
-        .catch(() => {
+        .catch((err) => {
           this.saving = false
+          if (err.response.status === 401) {
+            this.TOGGLE_SNACKBAR({
+              msg: `${err.response.data.message}`,
+              color: 'error',
+              position: 'top',
+              multiLine: false
+            })
+          }
         })
       }
     },

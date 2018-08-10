@@ -1,6 +1,6 @@
 <template>
   <div class="campaign-view">
-   <v-container :fluid="true" :fill-height="false">
+   <v-container v-if="userHasAdminRole" :fluid="true" :fill-height="false">
     <v-layout align-center justify-center>
       <v-flex xs12>
         <v-breadcrumbs divider="/">
@@ -71,22 +71,22 @@
               </template>
               <template slot="items" slot-scope="props">
                 <tr class="capitalize is-clickable" @click="campaignPositionUnderReview = props.item">
-                  <td>
+                  <td class="has-truncated-text">
                     <v-checkbox
                       v-if="props.item.id"
                       :input-value="props.selected"
                       primary hide-details
                     ></v-checkbox>
                   </td>
-                  <td>{{ props.item.id }}</td>
-                  <td>{{ props.item.name }}</td>
+                  <td class="has-truncated-text">{{ props.item.id }}</td>
+                  <td class="has-truncated-text">{{ props.item.name }}</td>
                   <td>
                     <div class="has-truncated-text" :style="{ 'width': '230px !important' }">
                       {{ props.item.description }}
                     </div>
                   </td>
-                  <td>{{ props.item.created_at }}</td>
-                  <td>
+                  <td class="has-truncated-text">{{ props.item.created_at }}</td>
+                  <td class="has-truncated-text">
                     <template v-if="props.item.id && !props.item.deleting">
                       <v-menu transition="slide-x-transition" offset-y offset-x>
                         <v-icon slot="activator">more_horiz</v-icon>
@@ -204,13 +204,18 @@ import { UCFIRST } from '@/utils/helpers'
 import {
     mapState,
     mapActions,
-    mapMutations
+    mapMutations,
+    mapGetters
   } from 'vuex'
 
 export default {
 
   computed: {
     ...mapState ('campaign', ['selectedCampaign']),
+
+    ...mapGetters('user', [
+        'userHasAdminRole'
+      ]),
 
     campaignPositions () {
       let length = this.selectedCampaign.campaign_positions.length
@@ -379,7 +384,7 @@ export default {
         this.saving = false
         this.errors = err.response.data.message
         this.TOGGLE_SNACKBAR({
-          msg: this.errors[0],
+          msg: this.errors[0] || 'An error occured while creating the campaign position',
           color: 'error'
         })
       })

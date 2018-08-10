@@ -6,7 +6,7 @@
 </template>
 
 <script>
-  import { mapActions, mapState } from 'vuex'
+  import { mapActions, mapState, mapGetters } from 'vuex'
 
   export default {
     data: () => ({
@@ -16,6 +16,9 @@
     computed: {
       ...mapState('auth', [
         'isLoggedIn'
+      ]),
+      ...mapGetters('user', [
+        'userHasAdminRole'
       ])
     },
 
@@ -24,7 +27,8 @@
         if (
           (
             newVal.name === 'register' ||
-            newVal.name === 'register'
+            (newVal.meta.restrictedToAdmin && !this.userHasAdminRole)  ||
+            newVal.name === 'login'
           ) && this.isLoggedIn
         ) {
           //todo make snackbar telling the user he is loggedin
@@ -36,7 +40,7 @@
         if (
           (
             newVal.name !== 'register' ||
-            newVal.name !== 'register'
+            newVal.name !== 'login'
           ) && !this.isLoggedIn
         ) {
           //todo make snackbar telling the user he is not loggedin
@@ -52,7 +56,7 @@
     },
 
     created () {
-      this.me().catch(() => {
+      this.me().catch((err) => {
         this.$router.push({
           name: 'login'
         })
@@ -76,6 +80,15 @@
       this.$router.afterEach((to, from) => {
         //  finish the progress bar
         this.$Progress.finish()
+      })
+
+      this.$router.beforeEach((to, from, next) => {
+        if (
+          !to.meta.restrictedToAdmin ||
+          ( to.meta.restrictedToAdmin && this.userHasAdminRole )
+        ) {
+          next()
+        }
       })
     },
 

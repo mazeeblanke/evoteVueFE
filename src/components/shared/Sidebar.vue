@@ -21,50 +21,53 @@
             </v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
-        <v-subheader class="mt-3 grey--text text--darken-1">ADMIN PANEL</v-subheader>
-        <v-list>
-          <v-list-tile ripple exact-active-class="active" :to="{ name : 'Dashboard' }">
-            <v-list-tile-content>
-              <v-list-tile-title>Dashboard</v-list-tile-title>
-              <v-list-tile-sub-title>Quick review metrics</v-list-tile-sub-title>
-            </v-list-tile-content>
-          </v-list-tile>
-        </v-list>
-        <v-list-group
-            v-for="item in items2"
-            v-model="item.active"
-            :key="item.title"
-            no-action
-          >
-            <v-list-tile slot="activator">
+
+        <template v-if="userHasAdminRole">
+          <v-subheader class="mt-3 grey--text text--darken-1">ADMIN PANEL</v-subheader>
+          <v-list>
+            <v-list-tile ripple exact-active-class="active" :to="{ name : 'Dashboard' }">
               <v-list-tile-content>
-                <v-list-tile-title>{{ item.title }}</v-list-tile-title>
+                <v-list-tile-title>Dashboard</v-list-tile-title>
+                <v-list-tile-sub-title>Quick review metrics</v-list-tile-sub-title>
               </v-list-tile-content>
             </v-list-tile>
-
-            <v-list-tile
-              ripple
-              :to="subItem.route"
-              v-for="subItem in item.items"
-              :key="subItem.title"
+          </v-list>
+          <v-list-group
+              v-for="item in items2"
+              v-model="item.active"
+              :key="item.title"
+              no-action
             >
-              <v-list-tile-content>
-                <v-list-tile-title class="fw400">{{ subItem.title }}</v-list-tile-title>
-              </v-list-tile-content>
+              <v-list-tile slot="activator">
+                <v-list-tile-content>
+                  <v-list-tile-title>{{ item.title }}</v-list-tile-title>
+                </v-list-tile-content>
+              </v-list-tile>
 
-              <v-list-tile-action>
-                <v-icon>{{ subItem.icon }}</v-icon>
-              </v-list-tile-action>
-            </v-list-tile>
-            <v-list-tile ripple @click.native="_disableActiveCampaign">
-              <v-list-tile-content>
-                <v-list-tile-title class="fw400 is-clickable">Disable Active Campaign</v-list-tile-title>
-              </v-list-tile-content>
-              <v-list-tile-action>
-                <v-icon>highlight</v-icon>
-              </v-list-tile-action>
-            </v-list-tile>
-          </v-list-group>
+              <v-list-tile
+                ripple
+                :to="subItem.route"
+                v-for="subItem in item.items"
+                :key="subItem.title"
+              >
+                <v-list-tile-content>
+                  <v-list-tile-title class="fw400">{{ subItem.title }}</v-list-tile-title>
+                </v-list-tile-content>
+
+                <v-list-tile-action>
+                  <v-icon>{{ subItem.icon }}</v-icon>
+                </v-list-tile-action>
+              </v-list-tile>
+              <v-list-tile ripple @click.native="_disableActiveCampaign">
+                <v-list-tile-content>
+                  <v-list-tile-title class="fw400 is-clickable">Disable Active Campaign</v-list-tile-title>
+                </v-list-tile-content>
+                <v-list-tile-action>
+                  <v-icon>highlight</v-icon>
+                </v-list-tile-action>
+              </v-list-tile>
+            </v-list-group>
+          </template>
         <v-list-tile class="mt-3">
           <v-list-tile-action>
             <v-icon color="grey darken-1">add_circle_outline</v-icon>
@@ -82,7 +85,7 @@
 </template>
 
 <script>
-import { mapState, mapActions, mapMutations } from  'vuex'
+import { mapState, mapActions, mapMutations, mapGetters } from  'vuex'
 export default {
   data: () => {
     return {
@@ -113,7 +116,8 @@ export default {
     }
   },
   computed: {
-    ...mapState('app', ['drawer'])
+    ...mapState('app', ['drawer']),
+    ...mapGetters('user', ['userHasAdminRole'])
   },
   methods: {
     ...mapActions('campaign', [
@@ -140,9 +144,9 @@ export default {
               color: 'success'
             })
           })
-          .catch(() => {
+          .catch((err) => {
            this.TOGGLE_SNACKBAR({
-              msg: 'An error occured !',
+              msg: `${err.response.data.message} Reload page`,
               color: 'error'
             })
           })

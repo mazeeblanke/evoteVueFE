@@ -41,24 +41,36 @@ export default new Router({
         {
           path: 'users',
           component: () => import('@/components/Users'),
-          name: 'Users'
+          name: 'Users',
+          meta: {
+            restrictedToAdmin: true
+          }
         },
         {
           path: 'campaigns',
           component: () => import('@/components/Campaigns'),
-          name: 'Campaigns'
+          name: 'Campaigns',
+          meta: {
+            restrictedToAdmin: true
+          }
         },
         {
           path: 'campaigns/:id',
           component: () => import('@/components/campaigns/CampaignView'),
           name: 'Campaign',
-          params: true
+          params: true,
+          meta: {
+            restrictedToAdmin: true
+          }
         },
         {
           path: 'analytics',
           component: () => import('@/components/Analytics'),
           // name: 'Analytics'
-          name: 'Dashboard'
+          name: 'Dashboard',
+          meta: {
+            restrictedToAdmin: true
+          }
         }
       ],
     }

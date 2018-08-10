@@ -1,5 +1,5 @@
 <template>
-  <v-container :fluid="true" :fill-height="false">
+  <v-container v-if="userHasAdminRole" :fluid="true" :fill-height="false">
     <v-layout align-center justify-center>
       <v-flex xs12>
         <v-breadcrumbs divider="/">
@@ -44,7 +44,7 @@
           </v-card-title>
           <v-data-table
             :headers="headers"
-            :items="users.data"
+            :items="formattedUsers"
             :search="search"
             :rows-per-page-items="perPageValues"
             :pagination.sync="pagination"
@@ -74,25 +74,30 @@
             </template>
             <template slot="items" slot-scope="props">
               <tr
+                class="capitalize"
                 :active="props.selected"
                 @click="props.selected = !props.selected"
               >
-                <td>
+                <td class="has-truncated-text">
                   <v-checkbox
+                    v-if="props.item.id"
                     :input-value="props.selected"
                     primary hide-details
                   ></v-checkbox>
                 </td>
-                <td>{{ props.item.id }}</td>
-                <td>{{ props.item.username }}</td>
-                <td>{{ props.item.email }}</td>
-                <td>{{ props.item.phone }}</td>
-                <td>{{ props.item.confirmed }}</td>
-                <td>{{ props.item.created_at }}</td>
-                <td>
-                  <v-icon small class="mr-2" @click="editItem(props.item)">
-                    edit
-                  </v-icon>
+                <td class="has-truncated-text">{{ props.item.id }}</td>
+                <td class="has-truncated-text">{{ props.item.username }}</td>
+                <td class="has-truncated-text">{{ props.item.email }}</td>
+                <td class="has-truncated-text">{{ props.item.phone }}</td>
+                <td class="has-truncated-text">{{ props.item.confirmed }}</td>
+                <td class="has-truncated-text">{{ props.item.created_at }}</td>
+                <td class="has-truncated-text">
+                  <v-icon
+                    v-if="props.item.id"
+                    small
+                    class="mr-2"
+                    @click="editItem(props.item)"
+                  > edit </v-icon>
                 </td>
               </tr>
             </template>
@@ -157,6 +162,18 @@
                           clearable
                         ></v-select>
                       </v-flex>
+                      <v-flex xs12 sm6 md4>
+                        <v-select
+                          :items="[{ text: 'Regular', name: 'regular' }, { text: 'Admin', name: 'admin' }]"
+                          v-model="editedItem.roles"
+                          item-text="text"
+                          item-value="name"
+                          label="Role"
+                          box
+                          clearable
+                          multiple
+                        ></v-select>
+                      </v-flex>
                   </v-layout>
                 </v-container>
               </v-card-text>
@@ -190,6 +207,8 @@
 <script>
   import {
     mapState,
+    mapMutations,
+    mapGetters,
     mapActions
   } from 'vuex'
 
@@ -200,11 +219,29 @@
 
     computed: {
       ...mapState('user', ['users']),
+
+      ...mapGetters('user', [
+        'userHasAdminRole'
+      ]),
+
+      formattedUsers () {
+        let length = this.users.data.length
+        let pageSize = this.pagination.rowsPerPage || 0
+        let emptyRowsLength = Math.abs(pageSize - length)
+        return [
+          ...this.users.data,
+          ...Array(emptyRowsLength).fill({})
+        ].slice(0, pageSize)
+      }
     },
 
     methods: {
 
-      ...mapActions('user', ['loadUsers', 'verifyUser']),
+      ...mapActions('user', ['loadUsers', 'verifyUser', 'updateUser']),
+
+      ...mapMutations('app', [
+        'TOGGLE_SNACKBAR'
+      ]),
 
       ...{
         UCFIRST
@@ -237,17 +274,23 @@
 
       save() {
         this.verifying = true
-        this.verifyUser({
-          confirmed: this.editedItem.confirmed,
-          userId: this.editedItem.id
-        })
+        let payload = {
+          ..._.pickBy(this.editedItem, i => i),
+          roles: this.editedItem.roles.map((r) => {
+            if (typeof r === 'object') {
+              return r.name;
+            }
+            return r;
+          })
+        }
+        this.updateUser(payload)
         .then(() => {
           this.close()
           this.snackbarText = "Succesfully updated user!"
           this.snackbar = true
           this.verifying = false
         })
-        .catch(() => {
+        .catch((err) => {
           this.verifying = false
         })
       }
@@ -276,8 +319,16 @@
             .then(() => {
               this.loading = false
             })
-            .catch(() => {
+            .catch((err) => {
               this.loading = false
+              if (err.response.status === 401) {
+                this.TOGGLE_SNACKBAR({
+                  msg: `${err.response.data.message}`,
+                  color: 'error',
+                  position: 'top',
+                  multiLine: false
+                })
+              }
             })
         },
 

@@ -5,7 +5,10 @@ const state = () => ({
   darkMode: true,
   snackbarText: null,
   snackbar: false,
-  snackbarColor: 'success'
+  snackbarColor: 'success',
+  timeout: 6000,
+  'multi-line': true,
+  position: 'right'
 })
 
 const mutations = {
@@ -21,9 +24,12 @@ const mutations = {
     if (!payload) {
       state.snackbar = false
     } else {
-      let { msg, color } = payload
+      let { msg, color, timeout, position, multiLine } = payload
       state.snackbar = true
-      state.snackbarColor = color
+      state.snackbarColor = color || state.snackbarColor
+      state.timeout = timeout < 0 ? state.timeout : timeout
+      state.position = position || state.position
+      state['multi-line'] = multiLine || state['multi-line']
       state.snackbarText = msg
     }
   }
