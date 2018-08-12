@@ -92,7 +92,7 @@ export default {
       items: [
         { icon: 'account_box', text: 'Profile', route: { name: 'Profile' } },
         { icon: 'history', text: 'Vote', route: { name: 'Vote' } },
-        { icon: 'history', text: 'Live Vote Results', route: 'b' },
+        { icon: 'history', text: 'Live Vote Results', route: { name: 'VoteResults' }},
       ],
       items2: [
         {
@@ -109,7 +109,7 @@ export default {
           items: [
             // { icon: 'add', title: 'Create Campaigns', route: 'd' },
             { icon: 'visibility', title: 'Campaigns', route: { name: 'Campaigns' }},
-            { icon: 'history', title: 'View Vote Results', route: 'f' }
+            { icon: 'history', title: 'View Vote Results', route: { name: 'VoteResults' }}
           ]
         }
       ]

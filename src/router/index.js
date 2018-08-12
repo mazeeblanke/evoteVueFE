@@ -39,6 +39,11 @@ export default new Router({
           name: 'Vote'
         },
         {
+          path: 'live-vote-results',
+          component: () => import('@/components/shared/LiveVoteResults'),
+          name: 'VoteResults'
+        },
+        {
           path: 'users',
           component: () => import('@/components/Users'),
           name: 'Users',

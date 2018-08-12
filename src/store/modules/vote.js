@@ -21,6 +21,12 @@ const actions = {
     return Vue.axios.get('votes/liveVote').then((res) => {
       return res.data
     })
+  },
+
+  liveVoteResults ({ commit }) {
+    return Vue.axios.get('votes/voteResults').then((res) => {
+      return res.data
+    })
   }
 }
 
