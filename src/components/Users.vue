@@ -275,6 +275,7 @@
       save() {
         this.verifying = true
         let payload = {
+          isAdminAction: true,
           ..._.pickBy(this.editedItem, i => i),
           roles: this.editedItem.roles.map((r) => {
             if (typeof r === 'object') {

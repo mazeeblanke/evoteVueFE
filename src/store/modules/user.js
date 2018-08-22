@@ -43,7 +43,9 @@ const actions = {
 
     updateUser ({ commit }, payload) {
       return Vue.axios.patch(`users/${payload.id}`, payload).then((res) => {
-        commit('SET_USER', res.data.data)
+        if (!payload.isAdminAction) {
+          commit('SET_USER', res.data.data)
+        }
         commit('UPDATE_USER', res.data)
         return res.data
       })
