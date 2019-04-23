@@ -4,7 +4,7 @@
       <v-flex xs12>
         <v-breadcrumbs divider="/">
           <v-breadcrumbs-item
-            :to="{ name: UCFIRST(route) }"
+            :to="route === 'dashboard' ? { name: UCFIRST(route) } : ''"
             active-class="is-white"
             ripple
             v-for="route in $route.path.split('/').filter(r => r)"
@@ -148,7 +148,7 @@ export default {
 
   mounted() {
     this.loading = true
-    this.liveVoteResults()
+    this.liveVoteResults({ id: this.$route.params.id })
     .then((res) => {
       this.results = res.data
       this.selectedPosition = this.availablePositions[0].value

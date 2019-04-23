@@ -45,7 +45,7 @@
               :search="search"
               :rows-per-page-items="perPageValues"
               :pagination.sync="pagination"
-              :total-items="selectedCampaign.campaign_positions.length"
+              :total-items="campaignPositions.length"
               :loading="loading"
               :headers-length=8
             >
@@ -107,8 +107,8 @@
                   </td>
                 </tr>
               </template>
-              <v-alert class="h480" slot="no-results" :value="true" color="error" icon="warning">
-                <div class="h480">
+              <v-alert class="" slot="no-results" :value="true" color="error" icon="warning">
+                <div class="">
                   Your search for "{{ search }}" found no results.
                 </div>
               </v-alert>
@@ -218,13 +218,13 @@ export default {
       ]),
 
     campaignPositions () {
-      let length = this.selectedCampaign.campaign_positions.length
+      let length = (this.selectedCampaign.campaign_positions || []).length
       let pageSize = this.pagination.rowsPerPage || 0
       let page = this.pagination.page
       let emptyRowsLength = Math.abs(pageSize - length)
 
       return [
-        ...this.selectedCampaign.campaign_positions,
+        ...(this.selectedCampaign.campaign_positions || []),
         ...Array(emptyRowsLength).fill({})
       ].slice(((pageSize * page) - pageSize) , pageSize * page)
     }
@@ -407,7 +407,7 @@ export default {
         this.saving = false
         this.errors = []
         this.norminees = []
-        console.log(res)
+        // console.log(res)
         this.campaignPositionUnderReview.norminations = [
           ...this.campaignPositionUnderReview.norminations,
           ...res
@@ -420,9 +420,9 @@ export default {
 
       })
       .catch((err) => {
-        console.log(err)
+        // console.log(err)
         this.saving = false
-        console.log(err.response.data)
+        // console.log(err.response.data)
         this.errors = err.response.data.message
         this.TOGGLE_SNACKBAR({
           msg: "An error occured!",
@@ -445,7 +445,7 @@ export default {
           confirmed
         } = this.pagination
 
-        console.log(this.$route.params)
+        // console.log(this.$route.params)
         this.filter = {
           limit: rowsPerPage,
           page,

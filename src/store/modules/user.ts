@@ -1,4 +1,5 @@
 import Vue from 'vue'
+import { AXIOS } from '../../services/ApiService';
 
 const init_state = () => {
     return {
@@ -35,14 +36,14 @@ const mutations = {
 
 const actions = {
     loadUsers ({ commit }, payload) {
-        return Vue.axios.get('users', { params: payload }).then((res) => {
+        return AXIOS.get('users', { params: payload }).then((res) => {
           commit('SET_USERS', res.data)
           return res.data
         })
     },
 
     updateUser ({ commit }, payload) {
-      return Vue.axios.patch(`users/${payload.id}`, payload).then((res) => {
+      return AXIOS.patch(`users/${payload.id}`, payload).then((res) => {
         if (!payload.isAdminAction) {
           commit('SET_USER', res.data.data)
         }
@@ -52,7 +53,7 @@ const actions = {
     },
 
     verifyUser ({ commit }, payload) {
-      return Vue.axios.patch('verifyUser', payload).then((res) => {
+      return AXIOS.patch('verifyUser', payload).then((res) => {
         commit('UPDATE_USER', res.data)
         return res.data
       })
@@ -60,7 +61,7 @@ const actions = {
 
     me ({ commit, state }) {
       state.loadingMe = true
-      return Vue.axios.get('me').then((res) => {
+      return AXIOS.get('me').then((res) => {
         commit('SET_USER', res.data)
         commit('auth/SET_LOGIN_STATE', true, { root: true })
         state.loadingMe = false

@@ -113,7 +113,7 @@ export default {
 
   computed: {
     isNewCampaign () {
-      return !!!this.editedItem.created_at
+      return !this.editedItem.created_at
     }
   },
 

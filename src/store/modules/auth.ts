@@ -1,4 +1,5 @@
-import Vue from 'vue'
+// import Vue from 'vue'
+import { AXIOS } from '../../services/ApiService';
 
 const init_state = () => {
   return {
@@ -19,14 +20,16 @@ const mutations = {
   LOGOUT (state) {
     state.isLoggedIn = false
     localStorage.removeItem('auth_token')
+    // localStorage.removeItem('vuex')
+    // console.log('sdds');
   }
 }
 
 const actions = {
   login({ commit }, payload) {
-    return Vue.axios.post('login', payload).then((res) => {
+    return AXIOS.post('login', payload).then((res) => {
       commit('SET_TOKEN', res.data)
-      return Vue.axios.get('me').then((res) => {
+      return AXIOS.get('me').then((res) => {
         commit('user/SET_USER', res.data, { root: true })
         return res.data
       })
@@ -34,9 +37,9 @@ const actions = {
   },
 
   signup({ commit }, payload) {
-    return Vue.axios.post('signup', payload).then((res) => {
+    return AXIOS.post('signup', payload).then((res) => {
       commit('SET_TOKEN', res.data)
-      return Vue.axios.get('me').then((res) => {
+      return AXIOS.get('me').then((res) => {
         commit('user/SET_USER', res.data, { root: true })
         return res.data
       })
@@ -45,6 +48,7 @@ const actions = {
 
   logout({ commit }) {
     commit('LOGOUT')
+    commit('campaign/CLEAR_STATE', null, { root: true });
   },
 
 }

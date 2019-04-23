@@ -13,7 +13,7 @@
                   <v-layout d-flex row wrap fill-height class="m0">
                     <v-flex d-flex align-center justify-center xs12>
                       <div>
-                        <h1 class="m0 text-center f120 fw900">4000</h1>
+                        <h1 class="m0 text-center f120 fw900">{{ dashboard.users_count || 0}}</h1>
                         <h5 class="text-center is-white">Users</h5>
                       </div>
                     </v-flex>
@@ -26,7 +26,7 @@
                   <v-layout row wrap fill-height class="m0">
                     <v-flex d-flex align-center justify-center xs12>
                       <div>
-                        <h1 class="m0 text-center f120 fw900">300</h1>
+                        <h1 class="m0 text-center f120 fw900">{{ dashboard.campaigns_count || 0 }}</h1>
                         <h5 class="text-center is-white">Campaigns</h5>
                       </div>
                     </v-flex>
@@ -39,7 +39,7 @@
                   <v-layout row wrap fill-height class="m0">
                     <v-flex d-flex align-center justify-center xs12>
                       <div>
-                        <h1 class="m0 text-center f120 fw900">10</h1>
+                        <h1 class="m0 text-center f120 fw900">{{ dashboard.admins_count || 0 }}</h1>
                         <h5 class="text-center is-white">Admins</h5>
                       </div>
                     </v-flex>
@@ -52,8 +52,8 @@
                   <v-layout row wrap fill-height class="m0">
                     <v-flex d-flex align-center justify-center xs12>
                       <div>
-                        <h1 class="m0 text-center f120 fw900">3</h1>
-                        <h5 class="text-center is-white">Devs</h5>
+                        <h1 class="m0 text-center f120 fw900">{{ dashboard.votes_count || 0 }}</h1>
+                        <h5 class="text-center is-white">Votes</h5>
                       </div>
                     </v-flex>
                   </v-layout>
@@ -86,7 +86,7 @@
             <VuePerfectScrollbar class="wrapper">
               <v-data-table
                 :headers="headers"
-                :items="users.data.slice(0, 7)"
+                :items="dashboard.users"
                 hide-actions
               >
                 <template slot="items" slot-scope="props">
@@ -104,7 +104,7 @@
                       </v-avatar>
                     </td>
                     <td>{{ props.item.username }}</td>
-                    <td>{{ props.item.confirmed }}</td>
+                    <td>{{ props.item.confirmed ? true : false }}</td>
                     <td>{{ props.item.created_at }}</td>
                   </tr>
                 </template>
@@ -138,6 +138,8 @@ export default {
     ...mapState('user', ['users']),
 
     ...mapState('app', ['darkMode']),
+
+    ...mapState('dashboard', ['dashboard']),
 
     options() {
       return {
@@ -194,10 +196,17 @@ export default {
   },
 
   mounted () {
+    this.loading = true;
     this.load()
+    this.loadDashboard().then(() => {
+      this.loading = false
+    })
   },
 
   methods: {
+    ...mapActions('dashboard', {
+      loadDashboard: 'loadDashboard'
+    }),
     load(){
       let lineCharts = this.$refs.lineCharts;
       // lineCharts.delegateMethod('showLoading', 'Loading...');
@@ -210,6 +219,7 @@ export default {
 
   data() {
     return {
+      loading: false,
       headers: [
         {
           text: 'Avatar'

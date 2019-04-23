@@ -58,14 +58,14 @@
                   <v-icon>{{ subItem.icon }}</v-icon>
                 </v-list-tile-action>
               </v-list-tile>
-              <v-list-tile ripple @click.native="_disableActiveCampaign">
+              <!-- <v-list-tile ripple @click.native="_disableActiveCampaign">
                 <v-list-tile-content>
                   <v-list-tile-title class="fw400 is-clickable">Disable Active Campaign</v-list-tile-title>
                 </v-list-tile-content>
                 <v-list-tile-action>
                   <v-icon>highlight</v-icon>
                 </v-list-tile-action>
-              </v-list-tile>
+              </v-list-tile> -->
             </v-list-group>
           </template>
         <v-list-tile class="mt-3">
@@ -91,8 +91,9 @@ export default {
     return {
       items: [
         { icon: 'account_box', text: 'Profile', route: { name: 'Profile' } },
-        { icon: 'history', text: 'Vote', route: { name: 'Vote' } },
-        { icon: 'history', text: 'Live Vote Results', route: { name: 'VoteResults' }},
+        { icon: 'visibility', text: 'Campaigns', route: { name: 'Campaigns' } },
+        // { icon: 'history', text: 'Vote', route: { name: 'Vote' } },
+        // { icon: 'history', text: 'Live Vote Results', route: { name: 'VoteResults' }},
       ],
       items2: [
         {
@@ -109,7 +110,7 @@ export default {
           items: [
             // { icon: 'add', title: 'Create Campaigns', route: 'd' },
             { icon: 'visibility', title: 'Campaigns', route: { name: 'Campaigns' }},
-            { icon: 'history', title: 'View Vote Results', route: { name: 'VoteResults' }}
+            // { icon: 'history', title: 'View Vote Results', route: { name: 'VoteResults' }}
           ]
         }
       ]

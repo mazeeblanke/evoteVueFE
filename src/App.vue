@@ -6,12 +6,9 @@
 </template>
 
 <script>
-  import { mapActions, mapState, mapGetters } from 'vuex'
+  import { mapActions, mapState, mapGetters, mapMutations } from 'vuex'
 
   export default {
-    data: () => ({
-
-    }),
 
     computed: {
       ...mapState('auth', [
@@ -31,6 +28,7 @@
             newVal.name === 'login'
           ) && this.isLoggedIn
         ) {
+          console.log(this.isLoggedIn, 'we weuweyu');
           //todo make snackbar telling the user he is loggedin
           this.$router.push({
             name: 'Profile'
@@ -39,7 +37,7 @@
 
         if (
           (
-            newVal.name !== 'register' ||
+            newVal.name !== 'register' &&
             newVal.name !== 'login'
           ) && !this.isLoggedIn
         ) {
@@ -52,11 +50,13 @@
     },
 
     methods: {
-      ...mapActions('user', ['me'])
+      ...mapActions('user', ['me']),
+      ...mapMutations('auth', ['SET_LOGIN_STATE'])
     },
 
     created () {
       this.me().catch((err) => {
+        this.SET_LOGIN_STATE(false);
         this.$router.push({
           name: 'login'
         })

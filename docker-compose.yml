@@ -1,0 +1,20 @@
+version: '2.1'
+
+services:
+
+  evotefe:
+    build:
+      context: .
+      dockerfile: dockerfile
+    ports:
+      - "3302:8080"
+    volumes:
+      - ./:/evote
+    networks:
+      - evotenet
+    healthcheck:
+      test: exit 0
+    restart: unless-stopped
+
+networks:
+  evotenet:

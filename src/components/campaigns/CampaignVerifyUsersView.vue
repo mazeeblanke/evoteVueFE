@@ -1,24 +1,9 @@
 <template>
-  <v-container v-if="userHasAdminRole" :fluid="true" :fill-height="false">
-    <v-layout align-center justify-center>
-      <v-flex xs12>
-        <v-breadcrumbs divider="/">
-          <v-breadcrumbs-item
-            :to="{ name: _UCFIRST(route) }"
-            active-class="is-white"
-            ripple
-            v-for="route in $route.path.split('/').filter(r => r)"
-            :key="route"
-            class="capitalize"
-          >
-            {{ route }}
-          </v-breadcrumbs-item>
-        </v-breadcrumbs>
-        <v-card raised :height=800>
+        <v-card raised :height=700>
           <v-card-title class="card-gradient">
             <div class="is-flex">
               <v-icon @click="$router.back()">arrow_left</v-icon>
-              <h3 class="headline">USERS</h3>
+              <h3 class="headline" :style="{'text-transform': 'capitalize'}">VERIFY {{selectedCampaign.name}} CAMPAIGN USERS</h3>
             </div>
             <v-spacer></v-spacer>
             <v-layout justify-end>
@@ -48,7 +33,7 @@
             :search="search"
             :rows-per-page-items="perPageValues"
             :pagination.sync="pagination"
-            :total-items="users.total"
+            :total-items="selectedCampaign.users.total"
             :loading="loading"
           >
             <template slot="headers" slot-scope="props">
@@ -85,12 +70,12 @@
                     primary hide-details
                   ></v-checkbox>
                 </td>
-                <td class="has-truncated-text">{{ props.item.id }}</td>
-                <td class="has-truncated-text">{{ props.item.username }}</td>
-                <td class="has-truncated-text">{{ props.item.email }}</td>
-                <td class="has-truncated-text">{{ props.item.phone }}</td>
-                <td class="has-truncated-text" ><span v-if="props.item.id">{{ props.item.confirmed ? true : false }}</span></td>
-                <td class="has-truncated-text">{{ props.item.created_at }}</td>
+                <td class="has-truncated-text">{{ props.item.user_id }}</td>
+                <td class="has-truncated-text">{{ (props.item.userdetails || {}).username }}</td>
+                <td class="has-truncated-text">{{ (props.item.userdetails || {}).email }}</td>
+                <td class="has-truncated-text">{{ (props.item.userdetails || {}).phone }}</td>
+                <td class="has-truncated-text">{{ (props.item && props.item.verified !== undefined) ? Boolean(props.item.verified) : null  }}</td>
+                <td class="has-truncated-text">{{ (props.item.userdetails || {}).created_at }}</td>
                 <td class="has-truncated-text">
                   <v-icon
                     v-if="props.item.id"
@@ -143,19 +128,18 @@
                         ></v-text-field>
                       </v-flex>
                       <v-flex xs12 sm6 md4>
-                        <v-select
-                          :items="[{ text: 'Locked', name: 1 }, { text: 'Unlocked', name: 0 }]"
-                          v-model="editedItem.locked_profile"
-                          item-text="text"
-                          item-value="name"
-                          label="Lock Status"
+                        <v-text-field
+                          v-model="editedItem.email"
+                          label="Email"
                           box
-                        ></v-select>
+                          clearable
+                          disabled
+                        ></v-text-field>
                       </v-flex>
                       <v-flex xs12 sm6 md4>
                         <v-select
                           :items="confirmation_statuses"
-                          v-model="editedItem.confirmed"
+                          v-model="editedItem.verified"
                           item-text="text"
                           item-value="value"
                           label="Verification status"
@@ -163,7 +147,7 @@
                           clearable
                         ></v-select>
                       </v-flex>
-                      <v-flex xs12 sm6 md4>
+                      <!-- <v-flex xs12 sm6 md4>
                         <v-select
                           :items="[{ text: 'Regular', name: 'regular' }, { text: 'Admin', name: 'admin' }]"
                           v-model="editedItem.roles"
@@ -174,7 +158,7 @@
                           clearable
                           multiple
                         ></v-select>
-                      </v-flex>
+                      </v-flex> -->
                   </v-layout>
                 </v-container>
               </v-card-text>
@@ -186,37 +170,21 @@
             </v-card>
           </v-dialog>
         </v-card>
-      </v-flex>
-    </v-layout>
-    <v-snackbar
-      v-model="snackbar"
-      :timeout="4000"
-      right
-    >
-      {{ snackbarText }}
-      <v-btn
-        dark
-        flat
-        @click="snackbar = false"
-      >
-        Close
-      </v-btn>
-    </v-snackbar>
-  </v-container>
 </template>
 
 <script lang="ts">
 
   import _ from 'lodash'
-  import { UCFIRST } from '../utils/helpers'
+  import { UCFIRST } from '../../utils/helpers'
   import { namespace } from 'vuex-class'
   import { Vue, Component, Watch } from 'vue-property-decorator'
 
   const user = namespace('user')
   const app = namespace('app')
+  const campaign = namespace('campaign')
 
   @Component
-  export default class Users extends Vue {
+  export default class CampaignVerifyUsersView extends Vue {
 
     loading: boolean = false
     verifying: boolean = false
@@ -226,15 +194,15 @@
     snackbarText: any = null
     editedIndex: any = null
     editedItem: any = {}
-    perPageValues: any = [10]
+    perPageValues: any = [9]
     search:any = null
-    confirmation_statuses: Array<{ value: number, text: string }> = [
+    confirmation_statuses: Array<{ value: boolean, text: string }> = [
       {
-        value: 1,
+        value: true,
         text: 'Verified'
       },
       {
-        value: 0,
+        value: false,
         text: 'Unverified'
       },
     ]
@@ -242,7 +210,7 @@
 
     filter: any = {
 
-      limit: 10,
+      limit: 9,
 
       page: 1
 
@@ -302,21 +270,18 @@
     ]
 
     @user.State('user') user: any
-    @user.State('users') users: any
+    // @user.State('users') users: any
+    @campaign.State('selectedCampaign') selectedCampaign: any
 
-    @user.Mutation('app') TOGGLE_SNACKBAR: any
+    @app.Mutation TOGGLE_SNACKBAR: any
 
-    @user.Getter('userHasAdminRole') userHasAdminRole
+    @user.Getter('userHasAdminRole') userHasAdminRole :any
 
-    @user.Action('loadUsers') loadUsers: any
+    @campaign.Action('loadCampaignUsers') loadCampaignUsers: any
+    @campaign.Action('verifyCampaignUser') verifyCampaignUser: any
+
     @user.Action('verifyUser') verifyUser: any
-    @user.Action('updateUser') updateUser: any
-    @user.Action('me') me: any
-
-    @Watch('$route', { deep: true })
-    handler() {
-      this.me();
-    }
+    // @user.Action('updateUser') updateUser: any
 
     @Watch('pagination', { deep: true })
     paginationHandler() {
@@ -332,9 +297,10 @@
         page,
         search: this.search || null,
         confirmed,
+        campaignId: this.$route.params.id
       }
 
-      this.loadUsers(this.filter)
+      this.loadCampaignUsers(this.filter)
         .then(() => {
           this.loading = false
         })
@@ -352,22 +318,23 @@
     }
 
     get formattedUsers () {
-      let length = this.users.data.length
+      let length = this.selectedCampaign.users.data.length
       let pageSize = this.pagination.rowsPerPage || 0
       let emptyRowsLength = Math.abs(pageSize - length)
       return [
-        ...this.users.data,
+        ...this.selectedCampaign.users.data,
         ...Array(emptyRowsLength).fill({})
       ].slice(0, pageSize)
     }
 
-    _UCFIRST (word) {
-      return UCFIRST(word)
+    _UCFIRST () {
+      return UCFIRST
     }
 
     editItem(item) {
-      this.editedIndex = this.users.data.indexOf(item)
-      this.editedItem = Object.assign({}, item)
+      this.editedIndex = this.selectedCampaign.users.data.indexOf(item)
+      // console.log(item);
+      this.editedItem = Object.assign({}, item, item.userdetails, { verified: Boolean(item.verified) })
       this.dialog = true
     }
 
@@ -378,8 +345,8 @@
     }
 
     deleteItem(item) {
-      const index = this.users.data.indexOf(item)
-      confirm('Are you sure you want to delete this item?') && this.users.data.splice(index, 1)
+      const index = this.selectedCampaign.users.data.indexOf(item)
+      confirm('Are you sure you want to delete this item?') && this.selectedCampaign.users.data.splice(index, 1)
     }
 
     close() {
@@ -392,40 +359,45 @@
 
     save() {
       this.verifying = true
+      // console.log(this.editedItem)
       let payload = {
-        isAdminAction: true,
-        ..._.pickBy(this.editedItem, i => i !== null),
-        roles: this.editedItem.roles.map((r) => {
-          if (typeof r === 'object') {
-            return r.name;
-          }
-          return r;
-        })
+        verified: this.editedItem.verified,
+        userId: this.editedItem.user_id,
+        campaignId: this.editedItem.campaign_id
       }
-      this.updateUser(payload)
+      this.verifyCampaignUser(payload)
       .then(() => {
         this.close()
-        this.snackbarText = "Succesfully updated user!"
-        this.snackbar = true
+        // this.snackbarText = "Succesfully updated user!"
+        // this.snackbar = true
         this.verifying = false
+        this.TOGGLE_SNACKBAR({
+          msg: "Succesfully updated user!",
+          color: 'success'
+        })
+
       })
       .catch((err) => {
+        this.TOGGLE_SNACKBAR({
+          msg: `${err.response.data.message}`,
+          color: "error"
+        });
         this.verifying = false
       })
     }
 
 
-    mounted () {
-      if (this.users.data.length) return
-      this.loading = true
-      this.loadUsers(this.filter)
-        .then(() => {
-          this.loading = false
-        })
-        .catch(() => {
-          this.loading = false
-        })
-    }
+    // mounted () {
+    //   if (this.selectedCampaign.users.data.length) return
+    //   this.loading = true
+    //   this.loadCampaignUsers({ ...this.filter, campaignId: this.$route.params.id})
+    //     .then(() => {
+    //       this.loading = false
+    //     })
+    //     .catch(() => {
+    //       this.loading = false
+    //     })
+    // }
 
 
 

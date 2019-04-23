@@ -4,7 +4,7 @@
       <v-flex xs12>
         <v-breadcrumbs divider="/">
           <v-breadcrumbs-item
-            :to="{ name: UCFIRST(route) }"
+            :to="route === 'dashboard' ? { name: UCFIRST(route) } : ''"
             active-class="is-white"
             ripple
             v-for="route in $route.path.split('/').filter(r => r)"
@@ -152,7 +152,7 @@ import { mapActions, mapState, mapMutations } from 'vuex'
 
         })
         .catch((err) => {
-          console.log(err)
+          // console.log(err)
           this.voting = false
           this.TOGGLE_SNACKBAR({
             msg: 'An error occured!',
@@ -203,9 +203,8 @@ import { mapActions, mapState, mapMutations } from 'vuex'
 
     mounted () {
       this.loading = true
-      this.liveVote()
+      this.liveVote({ id: this.$route.params.id })
       .then(res => {
-        console.log(res)
         if (res.campaign) {
           // this.votes = []
           this.liveCampaign = res.campaign
@@ -228,7 +227,7 @@ import { mapActions, mapState, mapMutations } from 'vuex'
               ...this.results,
               ...Array(10 - this.results.length).fill({})
             ]
-            console.log(this.results)
+            // console.log(this.results)
           }
         }
         this.loading = false
